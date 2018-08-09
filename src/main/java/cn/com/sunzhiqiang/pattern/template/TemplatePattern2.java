@@ -14,20 +14,20 @@ public abstract class TemplatePattern2 {
         postprocessImpl();
     }
 
-    void preprocessImpl(){
+    public void preprocessImpl(){
 
     }
 
-    abstract void processImpl();
+    public abstract void processImpl();
 
-    void postprocessImpl(){
+    public void postprocessImpl(){
 
     }
 }
 
 class TemplateImpl2 extends TemplatePattern2 {
 
-    void processImpl() {
-
+    public void processImpl() {
+        System.out.println("具体的处理");
     }
 }

@@ -14,24 +14,24 @@ public abstract class TemplatePattern {
         postprocessImpl();
     }
 
-    abstract void preprocessImpl();
+    public abstract void preprocessImpl();
 
-    abstract void processImpl();
+    public abstract void processImpl();
 
-    abstract void postprocessImpl();
+    public abstract void postprocessImpl();
 }
 
 class TemplateImpl extends TemplatePattern {
 
-    void preprocessImpl() {
+    public void preprocessImpl() {
         System.out.println("前置处理");
     }
 
-    void processImpl() {
+    public void processImpl() {
         System.out.println("处理中");
     }
 
-    void postprocessImpl() {
+    public void postprocessImpl() {
         System.out.println("后置处理");
     }
 }
