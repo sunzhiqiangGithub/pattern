@@ -21,16 +21,22 @@ public class Person2 {
     }
 
     public static Person2.PersonBuilder getBuilder() {
-        return new Person2.PersonBuilder();
+        return PersonBuilder.personBuilder;
     }
 
     private static class PersonBuilder {
+
+        private static final PersonBuilder personBuilder = new PersonBuilder();
 
         private String name;
 
         private int age;
 
         private String sex;
+
+        private PersonBuilder() {
+
+        }
 
         public PersonBuilder name(String name) {
             this.name = name;
@@ -76,10 +82,10 @@ public class Person2 {
     public static void main(String[] args) {
 
         Person2 person2 = Person2.getBuilder()
-                            .name("李四")
-                            .age(10)
-                            .sex("不确定")
-                            .build();
+                .name("李四")
+                .age(10)
+                .sex("不确定")
+                .build();
 
         System.out.println(person2);
     }
