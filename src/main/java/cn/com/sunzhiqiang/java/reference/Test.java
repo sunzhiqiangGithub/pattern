@@ -25,6 +25,7 @@ public class Test {
         WeakReference<Test> test2 = new WeakReference<Test>(new Test());
 
         //4. 虚引用
-        PhantomReference<Test> test3 = new PhantomReference<Test>(new Test(),new ReferenceQueue<Test>());
+        ReferenceQueue<Test> rf = new ReferenceQueue<Test>();
+        PhantomReference<Test> test3 = new PhantomReference<Test>(new Test(),rf);
     }
 }
