@@ -8,6 +8,14 @@ package cn.com.sunzhiqiang.java.builder;
  */
 public class Person2 {
 
+    private static final ThreadLocal<PersonBuilder> builder = new ThreadLocal<PersonBuilder>() {
+
+        @Override
+        protected PersonBuilder initialValue() {
+            return new PersonBuilder();
+        }
+    };
+
     private String name;
 
     private int age;
@@ -21,22 +29,17 @@ public class Person2 {
     }
 
     public static Person2.PersonBuilder getBuilder() {
-        return PersonBuilder.personBuilder;
+
+        return builder.get();
     }
 
     private static class PersonBuilder {
-
-        private static final PersonBuilder personBuilder = new PersonBuilder();
 
         private String name;
 
         private int age;
 
         private String sex;
-
-        private PersonBuilder() {
-
-        }
 
         public PersonBuilder name(String name) {
             this.name = name;
