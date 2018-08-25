@@ -21,3 +21,4 @@
 ### String类
 ### Integer类
 ### 零拷贝
+### Map缓存
