@@ -22,3 +22,4 @@
 ### Integer类
 ### 零拷贝
 ### Map缓存
+### AtomicInteger
