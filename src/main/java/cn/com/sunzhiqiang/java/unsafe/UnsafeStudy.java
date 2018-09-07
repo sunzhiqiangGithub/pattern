@@ -14,6 +14,8 @@ public class UnsafeStudy {
 
     private int b = 2;
 
+    private static int c = 3;
+
     class InnerClass {
         private int a = 2;
     }
@@ -38,8 +40,8 @@ public class UnsafeStudy {
         System.out.println(innerClass.a);
 
         // getInt(long var1) TODO 待研究如何使用
-//        int b = unsafe.getInt(unsafeStudy.b);
-//        System.out.println(b);
+//        int b = unsafe.getInt(addressOf(unsafe,unsafeStudy));
+//        System.out.println("===" + b);
 
         // getAddress(long var1) TODO 待研究如何使用
         long address = unsafe.getAddress(unsafe.allocateMemory(1000));
@@ -49,8 +51,28 @@ public class UnsafeStudy {
         System.out.println(unsafe.allocateMemory(1000));
 
         // reallocateMemory(long var1, long var3)
-        System.out.println(unsafe.reallocateMemory(unsafe.allocateMemory(1000),2000));
+        System.out.println(unsafe.reallocateMemory(unsafe.allocateMemory(1000), 2000));
 
         //
+    }
+
+    public static long addressOf(Unsafe unsafe, Object o) throws Exception {
+
+        Object[] array = new Object[]{o};
+
+        long baseOffset = unsafe.arrayBaseOffset(Object[].class);
+        int addressSize = unsafe.addressSize();
+        long objectAddress;
+        switch (addressSize) {
+            case 4:
+                objectAddress = unsafe.getInt(array, baseOffset);
+                break;
+            case 8:
+                objectAddress = unsafe.getLong(array, baseOffset);
+                break;
+            default:
+                throw new Error("unsupported address size: " + addressSize);
+        }
+        return (objectAddress);
     }
 }
