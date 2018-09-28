@@ -4,8 +4,8 @@
    而这些帮助方便的同步器工具类的基础框架就是AQS(AbstractQueuedSynchronizer),学习AQS对更好的理解常用的同步器工具类有很大帮助。
    
 ### 目标
-   学习AQS的目标是两个：
-   1.更好的理解常用的同步器工具类原理（CountDownLatch等）（必须）
+   学习AQS的目标是两个：  
+   1.更好的理解常用的同步器工具类原理（CountDownLatch等）（必须）  
    2.通过AQS实现自己的同步器类。（可选）
    
 ### 原理
