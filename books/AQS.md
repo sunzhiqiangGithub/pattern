@@ -18,7 +18,6 @@
    
 #### 成员变量
 ```java
-
     private static final long serialVersionUID = 7373984972572414691L;
 
     // 等待队列的头指针和尾指针
@@ -60,5 +59,266 @@ state用来表示同步状态
 head、tail分别是AQS维护的等待队列的头指针和尾指针。
 
 #### 等待队列结构
-![FIFO队列](https://github.com/sunzhiqiangGithub/pattern/blob/master/books/image/AQS队列.jpg)
+![FIFO队列](https://github.com/sunzhiqiangGithub/pattern/blob/master/books/image/AQS队列.jpg)  
+队列中的每个结点的结构为如下代码：
+```java
+    static final class Node {
+        
+        // 共享锁
+        static final Node SHARED = new Node();
+        // 独占锁
+        static final Node EXCLUSIVE = null;
+
+        // 线程已被取消
+        static final int CANCELLED =  1;
+        // 当前线程的后继线程需要被unpark(唤醒)
+        static final int SIGNAL    = -1;
+        // 线程(处在Condition休眠状态)在等待Condition唤醒
+        static final int CONDITION = -2;
+        // 共享模式下，确保向后面的结点传播
+        static final int PROPAGATE = -3;
+
+        // 等待状态
+        volatile int waitStatus;
+
+        // 前驱结点
+        volatile Node prev;
+
+        // 后继结点
+        volatile Node next;
+
+        // 等待获取锁的线程
+        volatile Thread thread;
+
+        // TODO
+        Node nextWaiter;
+
+        // 是不是共享锁
+        final boolean isShared() {
+            return nextWaiter == SHARED;
+        }
+
+        // 获取前驱结点
+        final Node predecessor() throws NullPointerException {
+            Node p = prev;
+            if (p == null)
+                throw new NullPointerException();
+            else
+                return p;
+        }
+
+        Node() {    // Used to establish initial head or SHARED marker
+        }
+
+        Node(Thread thread, Node mode) {     // Used by addWaiter
+            this.nextWaiter = mode;
+            this.thread = thread;
+        }
+
+        Node(Thread thread, int waitStatus) { // Used by Condition
+            this.waitStatus = waitStatus;
+            this.thread = thread;
+        }
+    }
+```
+
+#### 独占锁
+独占锁相关的api  
+1 不响应中断的获取  
+public final void acquire(int arg);  
+```java
+    public final void acquire(int arg) {
+        if (!tryAcquire(arg) &&
+            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+            selfInterrupt();
+    }
+```
+先获取锁，该方法为protected修饰，需要子类重写，调用子类的获取锁的方法  
+```java
+    protected boolean tryAcquire(int arg) {
+        throw new UnsupportedOperationException();
+    }
+```
+获取锁失败，增加一个结点到等待队列里  
+```java
+    private Node addWaiter(Node mode) {
+        Node node = new Node(Thread.currentThread(), mode);
+        // Try the fast path of enq; backup to full enq on failure
+        Node pred = tail;
+        if (pred != null) {
+            node.prev = pred;
+            if (compareAndSetTail(pred, node)) {
+                pred.next = node;
+                return node;
+            }
+        }
+        enq(node);
+        return node;
+    }
+```
+排队获取锁  
+```java
+    final boolean acquireQueued(final Node node, int arg) {
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head && tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null; // help GC
+                    failed = false;
+                    return interrupted;
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &&
+                    parkAndCheckInterrupt())
+                    interrupted = true;
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+```
+```java
+    static void selfInterrupt() {
+        Thread.currentThread().interrupt();
+    }
+```
+2 响应中断的获取  
+public final void acquireInterruptibly(int arg) throws InterruptedException;  
+```java
+    public final void acquireInterruptibly(int arg)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        if (!tryAcquire(arg))
+            doAcquireInterruptibly(arg);
+    }
+```
+```java
+    private void doAcquireInterruptibly(int arg)
+        throws InterruptedException {
+        final Node node = addWaiter(Node.EXCLUSIVE);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head && tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null; // help GC
+                    failed = false;
+                    return;
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &&
+                    parkAndCheckInterrupt())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+```
+3 响应中断的限时获取    
+public final boolean tryAcquireNanos(int arg, long nanosTimeout) throws InterruptedException;  
+```java
+    public final boolean tryAcquireNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (Thread.interrupted())
+            throw new InterruptedException();
+        return tryAcquire(arg) ||
+            doAcquireNanos(arg, nanosTimeout);
+    }
+```
+```java
+    private boolean doAcquireNanos(int arg, long nanosTimeout)
+            throws InterruptedException {
+        if (nanosTimeout <= 0L)
+            return false;
+        final long deadline = System.nanoTime() + nanosTimeout;
+        final Node node = addWaiter(Node.EXCLUSIVE);
+        boolean failed = true;
+        try {
+            for (;;) {
+                final Node p = node.predecessor();
+                if (p == head && tryAcquire(arg)) {
+                    setHead(node);
+                    p.next = null; // help GC
+                    failed = false;
+                    return true;
+                }
+                nanosTimeout = deadline - System.nanoTime();
+                if (nanosTimeout <= 0L)
+                    return false;
+                if (shouldParkAfterFailedAcquire(p, node) &&
+                    nanosTimeout > spinForTimeoutThreshold)
+                    LockSupport.parkNanos(this, nanosTimeout);
+                if (Thread.interrupted())
+                    throw new InterruptedException();
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+```
+4 释放  
+public final boolean release(int arg);  
+```java
+    public final boolean release(int arg) {
+        if (tryRelease(arg)) {
+            Node h = head;
+            if (h != null && h.waitStatus != 0)
+                unparkSuccessor(h);
+            return true;
+        }
+        return false;
+    }
+```
+```java
+    protected boolean tryRelease(int arg) {
+        throw new UnsupportedOperationException();
+    }
+```
+```java
+    private void unparkSuccessor(Node node) {
+        /*
+         * If status is negative (i.e., possibly needing signal) try
+         * to clear in anticipation of signalling.  It is OK if this
+         * fails or if status is changed by waiting thread.
+         */
+        int ws = node.waitStatus;
+        if (ws < 0)
+            compareAndSetWaitStatus(node, ws, 0);
+
+        /*
+         * Thread to unpark is held in successor, which is normally
+         * just the next node.  But if cancelled or apparently null,
+         * traverse backwards from tail to find the actual
+         * non-cancelled successor.
+         */
+        Node s = node.next;
+        if (s == null || s.waitStatus > 0) {
+            s = null;
+            for (Node t = tail; t != null && t != node; t = t.prev)
+                if (t.waitStatus <= 0)
+                    s = t;
+        }
+        if (s != null)
+            LockSupport.unpark(s.thread);
+    }
+```
+
+#### 共享锁
+共享锁相关的api  
+1 不响应中断的获取  
+public final void acquireShared(int arg);  
+2 响应中断的获取  
+public final void acquireSharedInterruptibly(int arg) throws InterruptedException;  
+3 响应中断的限时获取  
+public final boolean tryAcquireSharedNanos(int arg, long nanosTimeout) throws InterruptedException;  
+4 释放  
+public final boolean releaseShared(int arg);  
+ 
 
