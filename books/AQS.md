@@ -55,4 +55,10 @@
         } catch (Exception ex) { throw new Error(ex); }
     }
 ```   
+从上面的成员变量可以看出，核心的成员变量有3个：state、head、tail  
+state用来表示同步状态  
+head、tail分别是AQS维护的等待队列的头指针和尾指针。
+
+#### 等待队列结构
+![FIFO队列](https://github.com/sunzhiqiangGithub/pattern/blob/master/books/image/AQS队列.jpg)
 
