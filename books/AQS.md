@@ -142,9 +142,11 @@ public final void acquire(int arg);
 获取锁失败，增加一个结点到等待队列里  
 ```java
     private Node addWaiter(Node mode) {
+        // 根据mode的值决定生成的是独占结点还是共享结点，这里新加入的结点waitStatus应该为0
         Node node = new Node(Thread.currentThread(), mode);
-        // Try the fast path of enq; backup to full enq on failure
+        // 把上一步生成的结点插入队尾
         Node pred = tail;
+        // 队尾不为空，利用CAS修改队尾为新加入的结点
         if (pred != null) {
             node.prev = pred;
             if (compareAndSetTail(pred, node)) {
@@ -152,8 +154,28 @@ public final void acquire(int arg);
                 return node;
             }
         }
+        // 队尾为空或者CAS插入失败
         enq(node);
         return node;
+    }
+```
+将新加的结点插入队列  
+```java
+    private Node enq(final Node node) {
+        for (;;) {
+            Node t = tail;
+            if (t == null) { // 初始化等待队列
+                if (compareAndSetHead(new Node()))
+                    tail = head;
+            } else {
+                // 使用CAS将队尾更新为新结点
+                node.prev = t;
+                if (compareAndSetTail(t, node)) {
+                    t.next = node;
+                    return t;
+                }
+            }
+        }
     }
 ```
 排队获取锁  
@@ -163,7 +185,9 @@ public final void acquire(int arg);
         try {
             boolean interrupted = false;
             for (;;) {
+                // 获取当前结点的前驱结点
                 final Node p = node.predecessor();
+                // 如果当前结点是头结点的下一个结点，并且获取锁成功，设置当前结点为新的头结点，原来的头结点出队
                 if (p == head && tryAcquire(arg)) {
                     setHead(node);
                     p.next = null; // help GC
@@ -180,11 +204,52 @@ public final void acquire(int arg);
         }
     }
 ```
+重新设置头结点  
+```java
+   private void setHead(Node node) {
+        head = node;
+        node.thread = null;
+        node.prev = null;
+    }
+```
+判断是否应该挂起线程  
+```java
+    private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+        int ws = pred.waitStatus;
+        
+        // 如果前驱结点的状态为SIGNAL（表明当前驱结点释放锁时会恢复当前结点），返回true调用parkAndCheckInterrupt方法挂起当前线程
+        if (ws == Node.SIGNAL)
+            return true;
+        
+        // 等待状态大于0只有一种状态为取消状态
+        if (ws > 0) {
+            do {
+                // 向前遍历，找前边第一个状态不是取消的结点
+                node.prev = pred = pred.prev;
+            } while (pred.waitStatus > 0);
+            pred.next = node;
+        } else {
+            // 将前驱结点的等待状态更新为SIGNAL，下一次循环的时候返回true,挂起当前线程
+            compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
+        }
+        
+        return false;
+    }
+```
+挂起线程  
+```java
+    private final boolean parkAndCheckInterrupt() {
+        LockSupport.park(this);
+        return Thread.interrupted();
+    }
+```
+恢复中断状态  
 ```java
     static void selfInterrupt() {
         Thread.currentThread().interrupt();
     }
 ```
+  
 2 响应中断的获取  
 public final void acquireInterruptibly(int arg) throws InterruptedException;  
 ```java
