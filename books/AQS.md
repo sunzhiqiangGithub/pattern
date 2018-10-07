@@ -135,13 +135,13 @@ public final void acquire(int arg);
             selfInterrupt();
     }
 ```
-先获取锁，该方法为protected修饰，需要子类重写，调用子类的获取锁的方法  
+先获取同步状态，该方法为protected修饰，需要子类重写，调用子类的获取锁的方法  
 ```java
     protected boolean tryAcquire(int arg) {
         throw new UnsupportedOperationException();
     }
 ```
-获取锁失败，增加一个结点到等待队列里  
+获取同步状态失败，增加一个结点到等待队列里  
 ```java
     private Node addWaiter(Node mode) {
         // 根据mode的值决定生成的是独占结点还是共享结点，这里新加入的结点waitStatus应该为0
@@ -180,7 +180,7 @@ public final void acquire(int arg);
         }
     }
 ```
-排队获取锁  
+排队获取同步状态    
 ```java
     final boolean acquireQueued(final Node node, int arg) {
         boolean failed = true;
@@ -389,8 +389,8 @@ public final boolean release(int arg);
     }
 ```
 
-#### 共享锁
-共享锁相关的api  
+#### 共享模式
+共享模式相关的api  
 1 不响应中断的获取  
 public final void acquireShared(int arg);  
 ```java
