@@ -10,7 +10,7 @@
    
 ### 原理
    AQS是一个模板类，是用来构建锁和其他同步组件的基础框架。  
-   它的实现主要依赖一个volatile修饰int成员变量来表示同步状态，以及通过一个FIFO队列构成等待队列。  
+   它的实现主要依赖一个volatile修饰int成员变量来表示同步状态，以及通过一个FIFO队列构成同步队列。  
    状态的更新使用getState,setState以及compareAndSetState这三个方法。  
    同步器既支持独占式获取同步状态，也可以支持共享式获取同步状态，这样就可以方便的实现不同类型的同步组件。  
    它的子类通过重写AQS的几个protected修饰的用来改变同步状态的方法，具体排队和阻塞机制由AQS实现，
@@ -22,7 +22,7 @@
 ```java
     private static final long serialVersionUID = 7373984972572414691L;
 
-    // 等待队列的头指针和尾指针
+    // 同步队列的头指针和尾指针
     private transient volatile Node head;
     private transient volatile Node tail;
     
@@ -58,17 +58,17 @@
 ```   
 从上面的成员变量可以看出，核心的成员变量有3个：state、head、tail  
 state用来表示同步状态  
-head、tail分别是AQS维护的等待队列的头指针和尾指针。
+head、tail分别是AQS维护的同步队列的头指针和尾指针。
 
-#### 等待队列结构
+#### 同步队列结构
 ![FIFO队列](https://github.com/sunzhiqiangGithub/pattern/blob/master/books/image/AQS队列.jpg)  
 队列中的每个结点的结构为如下代码：
 ```java
     static final class Node {
         
-        // 共享锁
+        // 共享模式
         static final Node SHARED = new Node();
-        // 独占锁
+        // 独占模式
         static final Node EXCLUSIVE = null;
 
         // 线程已被取消
@@ -92,7 +92,7 @@ head、tail分别是AQS维护的等待队列的头指针和尾指针。
         // 等待获取锁的线程
         volatile Thread thread;
 
-        // TODO
+        // 等待队列中的下一个节点
         Node nextWaiter;
 
         // 是不是共享锁
@@ -124,8 +124,8 @@ head、tail分别是AQS维护的等待队列的头指针和尾指针。
     }
 ```
 
-#### 独占锁
-独占锁相关的api  
+#### 独占模式
+独占模式相关的api  
 1 不响应中断的获取  
 public final void acquire(int arg);  
 ```java
@@ -252,6 +252,8 @@ public final void acquire(int arg);
         Thread.currentThread().interrupt();
     }
 ```
+  流程如下:  
+  ![独占模式流程图](https://github.com/sunzhiqiangGithub/pattern/blob/master/books/image/独占获取流程图.png)
   
 2 响应中断的获取  
 public final void acquireInterruptibly(int arg) throws InterruptedException;  
