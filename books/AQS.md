@@ -14,8 +14,10 @@
    状态的更新使用getState,setState以及compareAndSetState这三个方法。  
    同步器既支持独占式获取同步状态，也可以支持共享式获取同步状态，这样就可以方便的实现不同类型的同步组件。  
    它的子类通过重写AQS的几个protected修饰的用来改变同步状态的方法，具体排队和阻塞机制由AQS实现，
-   它简化了锁的实现方式，屏蔽了同步状态的管理，线程的排队，等待和唤醒等底层操作。锁和同步器很好的隔离了使用者和实现者所需关注的领域。
+   它简化了锁的实现方式，屏蔽了同步状态的管理，线程的排队，等待和唤醒等底层操作。锁和同步器很好的隔离了使用者和实现者所需关注的领域。  
    
+   **子类需要重新的方法**
+   ![重写的方法](https://github.com/sunzhiqiangGithub/pattern/blob/master/books/image/method.png)
 #### 成员变量
 ```java
     private static final long serialVersionUID = 7373984972572414691L;
