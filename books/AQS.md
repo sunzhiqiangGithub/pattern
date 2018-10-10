@@ -10,17 +10,19 @@
    
 ### 原理
    AQS是一个模板类，是用来构建锁和其他同步组件的基础框架。  
-   它的实现主要依赖一个volatile修饰int成员变量来表示同步状态，以及通过一个FIFO队列构成等待队列。  
+   它的实现主要依赖一个volatile修饰int成员变量来表示同步状态，以及通过一个FIFO队列构成同步队列。  
    状态的更新使用getState,setState以及compareAndSetState这三个方法。  
    同步器既支持独占式获取同步状态，也可以支持共享式获取同步状态，这样就可以方便的实现不同类型的同步组件。  
    它的子类通过重写AQS的几个protected修饰的用来改变同步状态的方法，具体排队和阻塞机制由AQS实现，
-   它简化了锁的实现方式，屏蔽了同步状态的管理，线程的排队，等待和唤醒等底层操作。锁和同步器很好的隔离了使用者和实现者所需关注的领域。
+   它简化了锁的实现方式，屏蔽了同步状态的管理，线程的排队，等待和唤醒等底层操作。锁和同步器很好的隔离了使用者和实现者所需关注的领域。  
    
+   **子类需要重新的方法**
+   ![重写的方法](https://github.com/sunzhiqiangGithub/pattern/blob/master/books/image/method.png)
 #### 成员变量
 ```java
     private static final long serialVersionUID = 7373984972572414691L;
 
-    // 等待队列的头指针和尾指针
+    // 同步队列的头指针和尾指针
     private transient volatile Node head;
     private transient volatile Node tail;
     
@@ -56,17 +58,17 @@
 ```   
 从上面的成员变量可以看出，核心的成员变量有3个：state、head、tail  
 state用来表示同步状态  
-head、tail分别是AQS维护的等待队列的头指针和尾指针。
+head、tail分别是AQS维护的同步队列的头指针和尾指针。
 
-#### 等待队列结构
+#### 同步队列结构
 ![FIFO队列](https://github.com/sunzhiqiangGithub/pattern/blob/master/books/image/AQS队列.jpg)  
 队列中的每个结点的结构为如下代码：
 ```java
     static final class Node {
         
-        // 共享锁
+        // 共享模式
         static final Node SHARED = new Node();
-        // 独占锁
+        // 独占模式
         static final Node EXCLUSIVE = null;
 
         // 线程已被取消
@@ -90,7 +92,7 @@ head、tail分别是AQS维护的等待队列的头指针和尾指针。
         // 等待获取锁的线程
         volatile Thread thread;
 
-        // TODO
+        // 等待队列中的下一个节点
         Node nextWaiter;
 
         // 是不是共享锁
@@ -122,8 +124,8 @@ head、tail分别是AQS维护的等待队列的头指针和尾指针。
     }
 ```
 
-#### 独占锁
-独占锁相关的api  
+#### 独占模式
+独占模式相关的api  
 1 不响应中断的获取  
 public final void acquire(int arg);  
 ```java
@@ -133,13 +135,13 @@ public final void acquire(int arg);
             selfInterrupt();
     }
 ```
-先获取锁，该方法为protected修饰，需要子类重写，调用子类的获取锁的方法  
+先获取同步状态，该方法为protected修饰，需要子类重写，调用子类的获取锁的方法  
 ```java
     protected boolean tryAcquire(int arg) {
         throw new UnsupportedOperationException();
     }
 ```
-获取锁失败，增加一个结点到等待队列里  
+获取同步状态失败，增加一个结点到等待队列里  
 ```java
     private Node addWaiter(Node mode) {
         // 根据mode的值决定生成的是独占结点还是共享结点，这里新加入的结点waitStatus应该为0
@@ -178,7 +180,7 @@ public final void acquire(int arg);
         }
     }
 ```
-排队获取锁  
+排队获取同步状态    
 ```java
     final boolean acquireQueued(final Node node, int arg) {
         boolean failed = true;
@@ -217,7 +219,8 @@ public final void acquire(int arg);
     private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
         int ws = pred.waitStatus;
         
-        // 如果前驱结点的状态为SIGNAL（表明当前驱结点释放锁时会恢复当前结点），返回true调用parkAndCheckInterrupt方法挂起当前线程
+        // 如果前驱结点的状态为SIGNAL（表明当前驱结点释放锁时会恢复当前结点），
+        // 返回true调用parkAndCheckInterrupt方法挂起当前线程
         if (ws == Node.SIGNAL)
             return true;
         
@@ -249,6 +252,8 @@ public final void acquire(int arg);
         Thread.currentThread().interrupt();
     }
 ```
+  流程如下:  
+  ![独占模式流程图](https://github.com/sunzhiqiangGithub/pattern/blob/master/books/image/独占获取流程图.png)
   
 2 响应中断的获取  
 public final void acquireInterruptibly(int arg) throws InterruptedException;  
@@ -261,6 +266,8 @@ public final void acquireInterruptibly(int arg) throws InterruptedException;
             doAcquireInterruptibly(arg);
     }
 ```
+获取同步状态,获取失败调用doAcquireInterruptibly方法.
+
 ```java
     private void doAcquireInterruptibly(int arg)
         throws InterruptedException {
@@ -285,6 +292,8 @@ public final void acquireInterruptibly(int arg) throws InterruptedException;
         }
     }
 ```
+方法与acquire流程差不多,唯一的区别是,acquire只设置中断标志,而这个方法会抛出中断异常.
+
 3 响应中断的限时获取    
 public final boolean tryAcquireNanos(int arg, long nanosTimeout) throws InterruptedException;  
 ```java
@@ -296,11 +305,15 @@ public final boolean tryAcquireNanos(int arg, long nanosTimeout) throws Interrup
             doAcquireNanos(arg, nanosTimeout);
     }
 ```
+获取同步状态失败,调用doAcquireNanos方法.
+
 ```java
     private boolean doAcquireNanos(int arg, long nanosTimeout)
             throws InterruptedException {
+        // 超时时间小于等于0直接返回
         if (nanosTimeout <= 0L)
             return false;
+        // 计算什么时候超时
         final long deadline = System.nanoTime() + nanosTimeout;
         final Node node = addWaiter(Node.EXCLUSIVE);
         boolean failed = true;
@@ -314,11 +327,14 @@ public final boolean tryAcquireNanos(int arg, long nanosTimeout) throws Interrup
                     return true;
                 }
                 nanosTimeout = deadline - System.nanoTime();
+                // 超时直接返回
                 if (nanosTimeout <= 0L)
                     return false;
+                // 没超时时,挂起线程
                 if (shouldParkAfterFailedAcquire(p, node) &&
                     nanosTimeout > spinForTimeoutThreshold)
                     LockSupport.parkNanos(this, nanosTimeout);
+                // 响应中断
                 if (Thread.interrupted())
                     throw new InterruptedException();
             }
@@ -328,6 +344,8 @@ public final boolean tryAcquireNanos(int arg, long nanosTimeout) throws Interrup
         }
     }
 ```
+大致流程也和acquire差不多,增加了响应中断和超时返回.  
+
 4 释放  
 public final boolean release(int arg);  
 ```java
@@ -341,6 +359,8 @@ public final boolean release(int arg);
         return false;
     }
 ```
+释放同步状态失败直接返回,释放成功判断头结点的等待状态,不等于0调用unparkSuccessor方法.
+
 ```java
     protected boolean tryRelease(int arg) {
         throw new UnsupportedOperationException();
@@ -348,21 +368,13 @@ public final boolean release(int arg);
 ```
 ```java
     private void unparkSuccessor(Node node) {
-        /*
-         * If status is negative (i.e., possibly needing signal) try
-         * to clear in anticipation of signalling.  It is OK if this
-         * fails or if status is changed by waiting thread.
-         */
+    
+        // 更新头结点的状态为0
         int ws = node.waitStatus;
         if (ws < 0)
             compareAndSetWaitStatus(node, ws, 0);
 
-        /*
-         * Thread to unpark is held in successor, which is normally
-         * just the next node.  But if cancelled or apparently null,
-         * traverse backwards from tail to find the actual
-         * non-cancelled successor.
-         */
+        // 查找头结点后第一个状态不是取消的结点
         Node s = node.next;
         if (s == null || s.waitStatus > 0) {
             s = null;
@@ -370,20 +382,107 @@ public final boolean release(int arg);
                 if (t.waitStatus <= 0)
                     s = t;
         }
+        
+        // 头结点后存在没有取消的结点,唤醒该结点里的线程.
         if (s != null)
             LockSupport.unpark(s.thread);
     }
 ```
 
-#### 共享锁
-共享锁相关的api  
+#### 共享模式
+共享模式相关的api  
 1 不响应中断的获取  
 public final void acquireShared(int arg);  
+```java
+    public final void acquireShared(int arg) {
+        if (tryAcquireShared(arg) < 0)
+            doAcquireShared(arg);
+    }
+```
+获取同步状态,返回值大于等于0获取成功,获取失败调用doAcquireShared方法.  
+```java
+    private void doAcquireShared(int arg) {
+        // 增加一个结点到等待队列中
+        final Node node = addWaiter(Node.SHARED);
+        boolean failed = true;
+        try {
+            boolean interrupted = false;
+            for (;;) {
+                // 获取先驱结点,先驱结点是头结点,并且获取同步状态成功
+                final Node p = node.predecessor();
+                if (p == head) {
+                    int r = tryAcquireShared(arg);
+                    if (r >= 0) {
+                        setHeadAndPropagate(node, r); // 将head指向自己，还有剩余资源可以再唤醒之后的线程
+                        p.next = null; // help GC
+                        if (interrupted)
+                            selfInterrupt();
+                        failed = false;
+                        return;
+                    }
+                }
+                if (shouldParkAfterFailedAcquire(p, node) &&
+                    parkAndCheckInterrupt())
+                    interrupted = true;
+            }
+        } finally {
+            if (failed)
+                cancelAcquire(node);
+        }
+    }
+```
+```java
+    private void setHeadAndPropagate(Node node, int propagate) {
+        Node h = head; // Record old head for check below
+        setHead(node);
+        // 如果还有剩余资源，继续唤醒后面的线程
+        if (propagate > 0 || h == null || h.waitStatus < 0 ||
+            (h = head) == null || h.waitStatus < 0) {
+            Node s = node.next;
+            if (s == null || s.isShared())
+                doReleaseShared();
+        }
+    }
+```
+```java
+    private void doReleaseShared() {
+        for (;;) {
+            Node h = head;
+            if (h != null && h != tail) {
+                int ws = h.waitStatus;
+                if (ws == Node.SIGNAL) {
+                    if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
+                        continue;            // loop to recheck cases
+                    unparkSuccessor(h);  // 唤醒后继
+                }
+                else if (ws == 0 &&
+                         !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
+                    continue;                // loop on failed CAS
+            }
+            if (h == head)                   // loop if head changed
+                break;
+        }
+    }
+```
 2 响应中断的获取  
 public final void acquireSharedInterruptibly(int arg) throws InterruptedException;  
+相应中断的共享获取与acquireShared大致相同,只是由原来的修改中断状态改成抛出中断异常.  
+
 3 响应中断的限时获取  
 public final boolean tryAcquireSharedNanos(int arg, long nanosTimeout) throws InterruptedException;  
+与独占模式的相应API差不多,这里省略.  
+
 4 释放  
 public final boolean releaseShared(int arg);  
+```java
+    public final boolean releaseShared(int arg) {
+        if (tryReleaseShared(arg)) {
+            doReleaseShared();
+            return true;
+        }
+        return false;
+    }
+```
+释放同步状态成功,调用doReleaseShared方法.  
  
 
