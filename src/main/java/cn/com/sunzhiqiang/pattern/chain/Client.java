@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.chain;
+package cn.com.sunzhiqiang.pattern.chain;
 
 /**
  * @author sunzhiqiang
