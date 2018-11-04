@@ -57,4 +57,67 @@ public class ThreadPoolStudy {
                 new ThreadPoolExecutor.AbortPolicy()//线程池饱和时的策略
         );
     }
+
+    @Test
+    public void useThreadPool() throws Exception {
+
+        // 创建线程池
+        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
+                4,
+                6,
+                2,
+                TimeUnit.SECONDS,
+                new LinkedBlockingDeque<>(10)
+        );
+
+        try {
+            // 测试线程数小于核心池大小
+            testThreadPool(threadPool,
+                    3,
+                    "第一轮测试结束，测试线程数为3，小于核心池大小。");
+
+            // 测试线程数等于核心池大小
+            testThreadPool(threadPool,
+                    4,
+                    "第二轮测试结束，测试线程数为4，等于核心池大小。");
+
+            // 测试线程数大于核心池大小，但小于核心池加任务队列大小
+            testThreadPool(threadPool,
+                    9,
+                    "第三轮测试结束，测试线程数为9，大于核心池大小，没超过任务队列限制。");
+
+            // 测试线程数大于核心池和任务队列的大小和，但小于最大池大小和任务队列大小和
+            testThreadPool(threadPool,
+                    16,
+                    "第四轮测试结束，测试线程数为16，大于核心池加任务队列，小于最大池加任务队列。");
+
+            // 测试线程数大于线程池最大容量，默认饱和策略
+            testThreadPool(threadPool,
+                    20,
+                    "第五轮测试结束，测试线程数为20，大于线程池最大容量，默认饱和策略抛出异常。"
+            );
+
+        } finally {
+            threadPool.shutdown();
+        }
+    }
+
+    private void testThreadPool(ThreadPoolExecutor threadPool, int threadCount, String message) throws Exception {
+
+        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
+
+        for (int i = 0; i < threadCount; i++) {
+            threadPool.submit(() -> {
+                System.out.println(Thread.currentThread().getName());
+                TimeUnit.SECONDS.sleep(1);
+                countDownLatch.countDown();
+                return null;
+            });
+        }
+
+        countDownLatch.await();
+        System.out.println(message);
+    }
+
+
 }
