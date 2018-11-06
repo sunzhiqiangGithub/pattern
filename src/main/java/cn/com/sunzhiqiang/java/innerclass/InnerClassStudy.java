@@ -10,25 +10,44 @@ import org.junit.jupiter.api.Test;
  */
 public class InnerClassStudy {
 
+    private static int a;
+    private int b;
+
     // 成员内部类
     class InnerClass {
-
+        void method() {
+            System.out.println(a);//成员内部类可以访问外部类的静态成员
+            System.out.println(b); //成员内部类可以访问外部类的实例成员
+        }
     }
 
     // 静态内部类
     static class StaticInnerClass {
-
+        void method() {
+            System.out.println(a);//静态内部类只能访问外部类的静态成员
+        }
     }
 
-    public void method(){
+    public void method() {
+        int c = 1;
+        final int d = 2;
         // 局部内部类
-        class LocalInnerClass{
-
+        class LocalInnerClass {
+            void method() {
+                System.out.println(a);
+                System.out.println(b);
+                System.out.println(c);
+                System.out.println(d);
+            }
         }
 
         new Thread(new Runnable() { //匿名内部类
             @Override
             public void run() {
+                System.out.println(a);
+                System.out.println(b);
+                System.out.println(c);
+                System.out.println(d);
             }
         });
     }
@@ -43,7 +62,7 @@ public class InnerClassStudy {
         StaticInnerClass staticInnerClass = new InnerClassStudy.StaticInnerClass();
 
         // 局部内部类只能在方法中创建,基本上不用
-        class LocalInnerClass{
+        class LocalInnerClass {
         }
         new LocalInnerClass();
 
