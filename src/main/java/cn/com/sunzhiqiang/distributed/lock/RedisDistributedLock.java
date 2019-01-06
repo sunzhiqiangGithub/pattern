@@ -16,11 +16,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisDistributedLock implements DistributedLock {
 
+    private static final String DEFAULT_LOCK_KEY = "redis_lock_key";
+    private static final int DEFAULT_TIMEOUT = 5000;
+
     private final Jedis jedis;
 
     private final String owner;
-    private String defaultLockKey = "redis_lock_key";
-    private int defaultTimeout = 5000;
+    private String lockKey = DEFAULT_LOCK_KEY;
+    private int timeout = DEFAULT_TIMEOUT;
 
     public RedisDistributedLock() {
         jedis = JedisFactory.getJedis();
@@ -29,20 +32,20 @@ public class RedisDistributedLock implements DistributedLock {
 
     public RedisDistributedLock(int timeout) {
         this();
-        this.defaultTimeout = timeout;
+        this.timeout = timeout;
     }
 
     public RedisDistributedLock(String lockKey, int timeout) {
         this(timeout);
-        this.defaultLockKey = lockKey;
+        this.lockKey = lockKey;
     }
 
     @Override
     public void lock() {
 
         while (true) {
-            String result = jedis.set(defaultLockKey, owner,
-                    "nx", "px", defaultTimeout);
+            String result = jedis.set(lockKey, owner,
+                    "nx", "px", timeout);
             if (result != null && result.equalsIgnoreCase("OK")) {
                 return;
             } else {
@@ -58,8 +61,8 @@ public class RedisDistributedLock implements DistributedLock {
     @Override
     public boolean tryLock() {
 
-        String result = jedis.set(defaultLockKey, owner,
-                "nx", "px", defaultTimeout);
+        String result = jedis.set(lockKey, owner,
+                "nx", "px", timeout);
         if (result != null && result.equalsIgnoreCase("OK")) {
             return true;
         } else {
@@ -91,7 +94,7 @@ public class RedisDistributedLock implements DistributedLock {
 
         jedis.eval("if redis.call('get', KEYS[1]) == ARGV[1] " +
                         "then return redis.call('del',KEYS[1]) else return 0 end",
-                Collections.singletonList(defaultLockKey),
+                Collections.singletonList(lockKey),
                 Collections.singletonList(owner));
     }
 
