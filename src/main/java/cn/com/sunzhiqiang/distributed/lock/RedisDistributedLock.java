@@ -3,6 +3,7 @@ package cn.com.sunzhiqiang.distributed.lock;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.params.SetParams;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -16,27 +17,46 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisDistributedLock implements DistributedLock {
 
+    /**
+     * 默认的redis锁
+     */
     private static final String DEFAULT_LOCK_KEY = "redis_lock_key";
+    /**
+     * 默认的锁超时时间
+     */
     private static final int DEFAULT_TIMEOUT = 5000;
 
     private final Jedis jedis;
 
+    /**
+     * 锁的持有者
+     */
     private final String owner;
     private String lockKey = DEFAULT_LOCK_KEY;
-    private int timeout = DEFAULT_TIMEOUT;
+    private long timeout = DEFAULT_TIMEOUT;
 
     public RedisDistributedLock() {
         jedis = JedisFactory.getJedis();
         owner = UUID.randomUUID().toString();
     }
 
-    public RedisDistributedLock(int timeout) {
+    public RedisDistributedLock(long timeout) {
         this();
         this.timeout = timeout;
     }
 
-    public RedisDistributedLock(String lockKey, int timeout) {
+    public RedisDistributedLock(String lockKey, long timeout) {
         this(timeout);
+        this.lockKey = lockKey;
+    }
+
+    public RedisDistributedLock(long timeout, TimeUnit unit) {
+        this();
+        this.timeout = unit.toMillis(timeout);
+    }
+
+    public RedisDistributedLock(String lockKey, long timeout, TimeUnit unit) {
+        this(timeout, unit);
         this.lockKey = lockKey;
     }
 
@@ -44,8 +64,7 @@ public class RedisDistributedLock implements DistributedLock {
     public void lock() {
 
         while (true) {
-            String result = jedis.set(lockKey, owner,
-                    "nx", "px", timeout);
+            String result = jedis.set(lockKey, owner, SetParams.setParams().nx().px(timeout));
             if (result != null && result.equalsIgnoreCase("OK")) {
                 return;
             } else {
@@ -61,8 +80,7 @@ public class RedisDistributedLock implements DistributedLock {
     @Override
     public boolean tryLock() {
 
-        String result = jedis.set(lockKey, owner,
-                "nx", "px", timeout);
+        String result = jedis.set(lockKey, owner, SetParams.setParams().nx().px(timeout));
         if (result != null && result.equalsIgnoreCase("OK")) {
             return true;
         } else {
