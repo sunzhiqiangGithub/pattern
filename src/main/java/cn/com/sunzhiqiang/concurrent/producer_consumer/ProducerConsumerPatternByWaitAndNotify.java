@@ -1,17 +1,17 @@
-package cn.com.sunzhiqiang.java.producer_consumer;
+package cn.com.sunzhiqiang.concurrent.producer_consumer;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 功能描述: 通过BlockingQueue来实现生产者-消费者模型
+ * 功能描述: 通过Object的wait/notifyAll机制实现生产者-消费者模式
  *
  * @author sunzhiqiang
  * @create 2018-10-28
  */
-public class ProducerConsumerPatternByBlockingQueue {
+public class ProducerConsumerPatternByWaitAndNotify {
 
     /**
      * 自定义一个阻塞队列
@@ -20,34 +20,38 @@ public class ProducerConsumerPatternByBlockingQueue {
      */
     static class MyBlockQueue<T> {
 
-        private BlockingQueue<T> queue;
+        private Object lock = new Object();
+
+        private List<T> list = new LinkedList<>();
         private final int size;
 
         public MyBlockQueue(int size) {
             this.size = size;
-            queue = new LinkedBlockingQueue<>(size);
         }
 
         public void put(T t) throws InterruptedException {
-
-            if (queue.size() == size) {
-                System.out.println("阻塞队列已满，生产者等待队列不满。");
+            synchronized (lock) {
+                while (list.size() == size) {
+                    System.out.println("阻塞队列已满，生产者等待队列不满。");
+                    lock.wait();
+                }
+                list.add(t);
+                System.out.println("生产者放入：" + t);
+                lock.notifyAll();
             }
-
-            queue.put(t);
-            System.out.println("生产者放入：" + t);
         }
 
         public <T> T get() throws InterruptedException {
-
-            if (queue.size() == 0) {
-                System.out.println("阻塞队列为空，消费者等待队列不空。");
+            synchronized (lock) {
+                while (list.size() == 0) {
+                    System.out.println("阻塞队列为空，消费者等待队列不空。");
+                    lock.wait();
+                }
+                T t = (T) list.remove(0);
+                System.out.println("消费者消费了：" + t);
+                lock.notifyAll();
+                return t;
             }
-
-            T t = (T) queue.take();
-            System.out.println("消费者消费了：" + t);
-
-            return t;
         }
     }
 
@@ -91,7 +95,7 @@ public class ProducerConsumerPatternByBlockingQueue {
         public void run() {
             while (true) {
                 try {
-                    TimeUnit.SECONDS.sleep(1);
+                    TimeUnit.SECONDS.sleep(2);
                     queue.get();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

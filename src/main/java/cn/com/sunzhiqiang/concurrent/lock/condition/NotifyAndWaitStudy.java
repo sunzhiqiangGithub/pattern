@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.lock.condition;
+package cn.com.sunzhiqiang.concurrent.lock.condition;
 
 /**
  * 功能描述: 学习notify/wait

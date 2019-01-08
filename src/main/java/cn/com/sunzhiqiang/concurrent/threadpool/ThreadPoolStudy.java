@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.threadpool;
+package cn.com.sunzhiqiang.concurrent.threadpool;
 
 import org.junit.jupiter.api.Test;
 

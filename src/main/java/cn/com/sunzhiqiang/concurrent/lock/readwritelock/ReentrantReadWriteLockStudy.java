@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.lock.readwritelock;
+package cn.com.sunzhiqiang.concurrent.lock.readwritelock;
 
 import org.junit.jupiter.api.Test;
 

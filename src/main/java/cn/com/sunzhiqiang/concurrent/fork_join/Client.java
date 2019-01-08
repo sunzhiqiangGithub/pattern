@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.fork_join;
+package cn.com.sunzhiqiang.concurrent.fork_join;
 
 import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;

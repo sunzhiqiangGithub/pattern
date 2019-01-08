@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.atomic;
+package cn.com.sunzhiqiang.concurrent.atomic;
 
 import org.junit.jupiter.api.Test;
 

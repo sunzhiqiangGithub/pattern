@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.lock.condition;
+package cn.com.sunzhiqiang.concurrent.lock.condition;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,17 +1,18 @@
-package cn.com.sunzhiqiang.java.producer_consumer;
+package cn.com.sunzhiqiang.concurrent.producer_consumer;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 功能描述: 通过Object的wait/notifyAll机制实现生产者-消费者模式
+ * 功能描述: 通过信号量实现生产者-消费者模式
  *
  * @author sunzhiqiang
  * @create 2018-10-28
  */
-public class ProducerConsumerPatternByWaitAndNotify {
+public class ProducerConsumerPatternBySemaphore {
 
     /**
      * 自定义一个阻塞队列
@@ -20,37 +21,52 @@ public class ProducerConsumerPatternByWaitAndNotify {
      */
     static class MyBlockQueue<T> {
 
-        private Object lock = new Object();
-
-        private List<T> list = new LinkedList<>();
+        private Semaphore notFull;
+        private Semaphore notEmpty;
+        private Semaphore mutex;
+        private List<T> queue;
         private final int size;
 
         public MyBlockQueue(int size) {
             this.size = size;
+            notFull = new Semaphore(size);
+            notEmpty = new Semaphore(0);
+            mutex = new Semaphore(1);
+            queue = new LinkedList<>();
         }
 
         public void put(T t) throws InterruptedException {
-            synchronized (lock) {
-                while (list.size() == size) {
-                    System.out.println("阻塞队列已满，生产者等待队列不满。");
-                    lock.wait();
-                }
-                list.add(t);
+
+            if (queue.size() == size) {
+                System.out.println("阻塞队列已满，生产者等待队列不满。");
+            }
+
+            notFull.acquire();
+            mutex.acquire();
+            try {
+                queue.add(t);
                 System.out.println("生产者放入：" + t);
-                lock.notifyAll();
+                notEmpty.release();
+            } finally {
+                mutex.release();
             }
         }
 
         public <T> T get() throws InterruptedException {
-            synchronized (lock) {
-                while (list.size() == 0) {
-                    System.out.println("阻塞队列为空，消费者等待队列不空。");
-                    lock.wait();
-                }
-                T t = (T) list.remove(0);
+
+            if (queue.size() == 0) {
+                System.out.println("阻塞队列为空，消费者等待队列不空。");
+            }
+
+            notEmpty.acquire();
+            mutex.acquire();
+            try {
+                T t = (T) queue.remove(0);
                 System.out.println("消费者消费了：" + t);
-                lock.notifyAll();
+                notFull.release();
                 return t;
+            } finally {
+                mutex.release();
             }
         }
     }
@@ -71,7 +87,7 @@ public class ProducerConsumerPatternByWaitAndNotify {
             Random random = new Random();
             while (true) {
                 try {
-                    TimeUnit.SECONDS.sleep(1);
+                    TimeUnit.SECONDS.sleep(2);
                     queue.put(random.nextInt(10));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -95,7 +111,7 @@ public class ProducerConsumerPatternByWaitAndNotify {
         public void run() {
             while (true) {
                 try {
-                    TimeUnit.SECONDS.sleep(2);
+                    TimeUnit.SECONDS.sleep(1);
                     queue.get();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

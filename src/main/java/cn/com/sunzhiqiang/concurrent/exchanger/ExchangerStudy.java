@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.exchanger;
+package cn.com.sunzhiqiang.concurrent.exchanger;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Exchanger;

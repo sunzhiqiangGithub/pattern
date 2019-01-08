@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.lock;
+package cn.com.sunzhiqiang.concurrent.lock;
 
 import org.junit.jupiter.api.Test;
 

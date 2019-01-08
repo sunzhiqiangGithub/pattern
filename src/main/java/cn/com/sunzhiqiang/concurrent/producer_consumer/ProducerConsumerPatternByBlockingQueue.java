@@ -1,20 +1,17 @@
-package cn.com.sunzhiqiang.java.producer_consumer;
+package cn.com.sunzhiqiang.concurrent.producer_consumer;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 功能描述: 通过condition实现生产者-消费者模式
+ * 功能描述: 通过BlockingQueue来实现生产者-消费者模型
  *
  * @author sunzhiqiang
  * @create 2018-10-28
  */
-public class ProducerConsumerPatternByCondition {
+public class ProducerConsumerPatternByBlockingQueue {
 
     /**
      * 自定义一个阻塞队列
@@ -23,48 +20,34 @@ public class ProducerConsumerPatternByCondition {
      */
     static class MyBlockQueue<T> {
 
-        private Lock lock = new ReentrantLock();
-        private Condition notEmpty = lock.newCondition();
-        private Condition notFull = lock.newCondition();
-
-        private List<T> list = new LinkedList<>();
+        private BlockingQueue<T> queue;
         private final int size;
 
         public MyBlockQueue(int size) {
             this.size = size;
+            queue = new LinkedBlockingQueue<>(size);
         }
 
         public void put(T t) throws InterruptedException {
-            lock.lock();
-            try {
-                while (list.size() == size) {
-                    System.out.println("阻塞队列已满，生产者等待队列不满。");
-                    notFull.await();
-                }
-                list.add(t);
-                System.out.println("生产者放入：" + t);
-                notEmpty.signalAll();
 
-            } finally {
-                lock.unlock();
+            if (queue.size() == size) {
+                System.out.println("阻塞队列已满，生产者等待队列不满。");
             }
+
+            queue.put(t);
+            System.out.println("生产者放入：" + t);
         }
 
         public <T> T get() throws InterruptedException {
-            lock.lock();
-            try {
-                while (list.size() == 0) {
-                    System.out.println("阻塞队列为空，消费者等待队列不空。");
-                    notEmpty.await();
-                }
-                T t = (T) list.remove(0);
-                System.out.println("消费者消费了：" + t);
-                notFull.signalAll();
-                return t;
 
-            } finally {
-                lock.unlock();
+            if (queue.size() == 0) {
+                System.out.println("阻塞队列为空，消费者等待队列不空。");
             }
+
+            T t = (T) queue.take();
+            System.out.println("消费者消费了：" + t);
+
+            return t;
         }
     }
 
@@ -108,7 +91,7 @@ public class ProducerConsumerPatternByCondition {
         public void run() {
             while (true) {
                 try {
-                    TimeUnit.SECONDS.sleep(2);
+                    TimeUnit.SECONDS.sleep(1);
                     queue.get();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

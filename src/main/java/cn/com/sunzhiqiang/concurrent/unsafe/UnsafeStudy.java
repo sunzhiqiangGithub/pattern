@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.unsafe;
+package cn.com.sunzhiqiang.concurrent.unsafe;
 
 import sun.misc.Unsafe;
 

@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.java.threadpool;
+package cn.com.sunzhiqiang.concurrent.threadpool;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
