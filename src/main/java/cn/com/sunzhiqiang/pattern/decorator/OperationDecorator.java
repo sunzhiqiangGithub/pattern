@@ -7,16 +7,17 @@ package cn.com.sunzhiqiang.pattern.decorator;
  */
 public class OperationDecorator implements Programmer {
 
+    private Programmer programmer;
+
+    public OperationDecorator(Programmer programmer) {
+        this.programmer = programmer;
+    }
+
     @Override
     public void program() {
 
-        System.out.println("服务端编程");
+        programmer.program();
 
-        operation();
-    }
-
-    private void operation() {
-
-        System.out.println("部署程序");
+        System.out.println("自动化部署程序");
     }
 }
