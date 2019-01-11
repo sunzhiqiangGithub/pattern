@@ -12,31 +12,54 @@ public class HeapSort implements Sort {
     @Override
     public int[] sort(int[] waitingSortArray) {
 
-        int[] minHeap = createMinHeap(waitingSortArray);
+        int[] sortedArray = internalHeapSort(waitingSortArray);
 
-        return minHeap;
+        return sortedArray;
     }
 
-    private int[] createMinHeap(int[] waitingSortArray) {
+    private int[] internalHeapSort(int[] waitingSortArray) {
 
-        int[] minHeap = new int[waitingSortArray.length];
-
-        for (int i = 0; i < minHeap.length; i++) {
-
-            // 生成堆结构
-            for (int j = waitingSortArray.length - 1 - i; j > 0; j--) {
-                if (waitingSortArray[j] < waitingSortArray[j / 2]) {
-                    int temp = waitingSortArray[j];
-                    waitingSortArray[j] = waitingSortArray[j / 2];
-                    waitingSortArray[j] = temp;
-                }
-            }
-
-            minHeap[i] = waitingSortArray[0];
-
-            waitingSortArray[0] = waitingSortArray[waitingSortArray.length - 1 - i];
+        // 初始化最大堆
+        for (int i = waitingSortArray.length / 2; i >= 0; i--) {
+            // 调整堆结构
+            createMaxHeapify(waitingSortArray, waitingSortArray.length, i);
         }
 
-        return minHeap;
+        for (int i = 0; i < waitingSortArray.length; i++) {
+            int temp = waitingSortArray[waitingSortArray.length - 1 - i];
+            waitingSortArray[waitingSortArray.length - 1 - i] = waitingSortArray[0];
+            waitingSortArray[0] = temp;
+
+            createMaxHeapify(waitingSortArray, waitingSortArray.length - 1 - i, 0);
+        }
+
+        return waitingSortArray;
+    }
+
+    private void createMaxHeapify(int[] waitingSortArray, int heapSize, int i) {
+
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        boolean exchange = false;
+        int maxIndex = i;
+
+        if (left < heapSize && waitingSortArray[maxIndex] < waitingSortArray[left]) {
+            maxIndex = left;
+            exchange = true;
+        }
+
+        if (right < heapSize && waitingSortArray[maxIndex] < waitingSortArray[right]) {
+            maxIndex = right;
+            exchange = true;
+        }
+
+        if (exchange) {
+            int temp = waitingSortArray[i];
+            waitingSortArray[i] = waitingSortArray[maxIndex];
+            waitingSortArray[maxIndex] = temp;
+
+            createMaxHeapify(waitingSortArray, heapSize, maxIndex);
+        }
     }
 }
