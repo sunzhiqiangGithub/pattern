@@ -13,6 +13,10 @@ public class SortContext {
         this.sort = sort;
     }
 
+    public void setSort(Sort sort) {
+        this.sort = sort;
+    }
+
     public int[] sort(int[] waitingSortArray) {
 
         return sort.sort(waitingSortArray);

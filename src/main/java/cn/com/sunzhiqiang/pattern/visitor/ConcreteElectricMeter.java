@@ -18,7 +18,8 @@ public class ConcreteElectricMeter implements ElectricMeter {
     @Override
     public void accept(MeterReader meterReader) {
 
-        meterReader.calcPrice(this);
+        BigDecimal totalPrice = meterReader.calcPrice(this);
+        System.out.println(totalPrice);
     }
 
     public BigDecimal getMeter() {

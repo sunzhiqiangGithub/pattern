@@ -14,8 +14,8 @@ public class ShellSort implements Sort {
 
         int increment = waitingSortArray.length / 2;
         while (increment > 0) {
-            for (int i = 1; i < waitingSortArray.length; i++) {
-                for (int j = i - 1 + increment; j < waitingSortArray.length; j = j + increment) {
+            for (int i = increment; i < waitingSortArray.length; i++) {
+                for (int j = i; j < waitingSortArray.length; j = j + increment) {
                     if (waitingSortArray[j] < waitingSortArray[j - increment]) {
                         int temp = waitingSortArray[j];
                         waitingSortArray[j] = waitingSortArray[j - increment];

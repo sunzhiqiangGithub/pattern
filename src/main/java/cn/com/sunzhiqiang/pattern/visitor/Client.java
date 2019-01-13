@@ -20,8 +20,7 @@ public class Client {
         MeterReader meterReader = new ConcreteMeterReader();
 
         for (ElectricMeter electricMeter : electricBox.getElectricMeters()) {
-            BigDecimal totalPrice = meterReader.calcPrice((ConcreteElectricMeter) electricMeter);
-            System.out.println(totalPrice);
+            electricMeter.accept(meterReader);
         }
     }
 }

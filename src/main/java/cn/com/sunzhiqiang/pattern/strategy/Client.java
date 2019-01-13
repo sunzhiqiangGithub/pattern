@@ -16,7 +16,7 @@ public class Client {
         SortContext sortContext = new SortContext(new MergeSort());
         System.out.println(Arrays.toString(sortContext.sort(waitingSortArray)));
 
-        sortContext = new SortContext(new QuickSort());
+        sortContext.setSort(new QuickSort());
         System.out.println(Arrays.toString(sortContext.sort(waitingSortArray)));
     }
 }
