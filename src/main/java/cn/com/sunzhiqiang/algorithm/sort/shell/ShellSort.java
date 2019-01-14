@@ -15,11 +15,13 @@ public class ShellSort implements Sort {
         int increment = waitingSortArray.length / 2;
         while (increment > 0) {
             for (int i = increment; i < waitingSortArray.length; i++) {
-                for (int j = i; j < waitingSortArray.length; j = j + increment) {
+                for (int j = i; j >= increment; j = j - increment) {
                     if (waitingSortArray[j] < waitingSortArray[j - increment]) {
                         int temp = waitingSortArray[j];
                         waitingSortArray[j] = waitingSortArray[j - increment];
                         waitingSortArray[j - increment] = temp;
+                    } else {
+                        break;
                     }
                 }
             }
