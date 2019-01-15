@@ -34,12 +34,11 @@ public class CountSort implements Sort {
     private int maxValue(int[] waitingSortArray) {
 
         int max = Integer.MIN_VALUE;
-        int indexOfMaxValue = -1;
         for (int i = 0; i < waitingSortArray.length; i++) {
             if (waitingSortArray[i] > max) {
-                indexOfMaxValue = i;
+                max = waitingSortArray[i];
             }
         }
-        return waitingSortArray[indexOfMaxValue];
+        return max;
     }
 }
