@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.data.structure.heap;
+package cn.com.sunzhiqiang.data.structure.tree.heap;
 
 
 import java.util.Arrays;
