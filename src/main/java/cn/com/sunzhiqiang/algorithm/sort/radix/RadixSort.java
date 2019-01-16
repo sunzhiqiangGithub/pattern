@@ -24,17 +24,18 @@ public class RadixSort implements Sort {
         int max = getMaxValue(waitingSortArray);
         int maxDigit = getDigit(max);
 
-        int[][] buckets = new int[maxDigit][0];
-        for (int i = 0; i < waitingSortArray.length; i++) {
-            buckets[getDigit(waitingSortArray[i]) - 1] =
-                    arrAppend(buckets[getDigit(waitingSortArray[i]) - 1], waitingSortArray[i]);
-        }
+        for (int i = 0, dev = 1; i <= maxDigit; i++, dev *= 10) {
+            int[][] buckets = new int[20][0];
+            for (int j = 0; j < waitingSortArray.length; j++) {
+                int index = waitingSortArray[j] / dev % 10 + 10;
+                buckets[index] = arrAppend(buckets[index], waitingSortArray[j]);
+            }
 
-        int temp = 0;
-        for (int i = 0; i < buckets.length; i++) {
-            int[] sortedArray = sort.sort(buckets[i]);
-            for (int j = 0; j < sortedArray.length; j++) {
-                waitingSortArray[temp++] = sortedArray[j];
+            int temp = 0;
+            for (int[] bucket : buckets) {
+                for (int k = 0; k < bucket.length; k++) {
+                    waitingSortArray[temp++] = bucket[k];
+                }
             }
         }
 
