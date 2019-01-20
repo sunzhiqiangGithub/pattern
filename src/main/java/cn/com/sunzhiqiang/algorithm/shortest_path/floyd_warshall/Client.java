@@ -1,6 +1,5 @@
 package cn.com.sunzhiqiang.algorithm.shortest_path.floyd_warshall;
 
-import cn.com.sunzhiqiang.algorithm.shortest_path.Result;
 import cn.com.sunzhiqiang.algorithm.shortest_path.Side;
 import com.google.common.collect.Lists;
 

@@ -1,4 +1,4 @@
-package cn.com.sunzhiqiang.algorithm.shortest_path;
+package cn.com.sunzhiqiang.algorithm.shortest_path.floyd_warshall;
 
 import lombok.Data;
 
@@ -13,7 +13,7 @@ import java.util.Map;
  * @create 2019-01-20
  */
 @Data
-public class Result {
+class Result {
 
     /**
      * 封装最小路径值的矩阵
