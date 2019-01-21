@@ -23,7 +23,7 @@ public class MyQueue<T> {
         count = 0;
     }
 
-    public synchronized boolean add(T o) {
+    public synchronized boolean offer(T o) {
 
         if (count == innerArray.length) {
             return false;
@@ -40,7 +40,7 @@ public class MyQueue<T> {
         return true;
     }
 
-    public synchronized T remove() {
+    public synchronized T pop() {
 
         if (count == 0) {
             return null;
@@ -56,6 +56,21 @@ public class MyQueue<T> {
         count--;
 
         return t;
+    }
+
+    public synchronized boolean isFull() {
+
+        return count == innerArray.length;
+    }
+
+    public synchronized boolean isEmpty() {
+
+        return count == 0;
+    }
+
+    public synchronized T peek(){
+
+        return innerArray[head];
     }
 
     public String toString() {

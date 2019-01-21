@@ -16,9 +16,9 @@ public class Client {
         Random random = new Random();
         for (int i = 0; i < 100; i++) {
             if (i % 3 == 0) {
-                myQueue.remove();
+                myQueue.pop();
             } else {
-                boolean success = myQueue.add(random.nextInt(30));
+                boolean success = myQueue.offer(random.nextInt(30));
             }
 
             System.out.println(myQueue.toString());
