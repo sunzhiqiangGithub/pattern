@@ -31,4 +31,9 @@ public class Side {
         this.endPoint = endPoint;
         this.weights = weights;
     }
+
+    public Side(int startPoint, int endPoint) {
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
+    }
 }
