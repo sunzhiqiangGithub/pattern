@@ -1,6 +1,6 @@
 # pattern
 
->## 设计模式
+## <font color="#000066">设计模式</font>
 + 单例模式
 + 模板方法模式
 + 代理模式
@@ -18,7 +18,7 @@
 + 装饰模式
 + 策略模式
 
->## java基础
+## <font color="#000066">java基础</font>
 + java里4种引用类型
 + 使用builder模式构建javabean
 + java.util.Objects类使用方法
@@ -29,7 +29,7 @@
 + Map缓存
 + 内部类
 
->## java并发
+## <font color="#000066">java并发</font>
 + AtomicInteger
 + Unsafe类
 + AtomicStampedReference类 // TODO
@@ -42,13 +42,13 @@
 + Exchanger
 + Fork/Join框架
 
->## 框架
+## <font color="#000066">框架</font>
 + Snowflake
 
->## 分布式
+## <font color="#000066">分布式</font>
 + 分布式锁
 
->## 算法
+## <font color="#000066">算法</font>
 ### 排序算法
 + 插入排序
 + 归并排序
@@ -68,7 +68,7 @@
 + 深度优先遍历
 + 广度优先遍历
 
->## 数据结构
+## <font color="#000066">数据结构</font>
 + 堆
 + 队列
 + 栈
