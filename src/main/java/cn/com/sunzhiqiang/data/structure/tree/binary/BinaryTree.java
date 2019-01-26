@@ -209,7 +209,7 @@ public class BinaryTree {
      */
     public void preOrderTraversal(Node root) {
 
-        if (root == null) {
+        if (root == null || root.data == null) {
             return;
         }
 
@@ -225,7 +225,7 @@ public class BinaryTree {
      */
     public void inOrderTraversal(Node root) {
 
-        if (root == null) {
+        if (root == null || root.data == null) {
             return;
         }
 
@@ -241,7 +241,7 @@ public class BinaryTree {
      */
     public void postOrderTraversal(Node root) {
 
-        if (root == null) {
+        if (root == null || root.data == null) {
             return;
         }
 
