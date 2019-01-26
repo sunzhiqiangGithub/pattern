@@ -13,12 +13,23 @@ public class Client {
         BinaryTree tree = new BinaryTree();
         BinaryTree.Node root = tree.createTree(new Integer[]{5, 3, 1, 8, 9, 4});
 
-        tree.preorderTraversal(root);
+        tree.preOrderTraversal(root);
         System.out.println();
 
-        tree.inorderTraversal(root);
+        tree.inOrderTraversal(root);
         System.out.println();
 
-        tree.postorderTraversal(root);
+        tree.postOrderTraversal(root);
+        System.out.println();
+
+        System.out.println(tree.contain(root, 1));
+        System.out.println(tree.contain(root, 89));
+
+        tree.preOrderTraversal(root);
+        System.out.println();
+        tree.deleteNodeFromTree(root, 5);
+        tree.preOrderTraversal(root);
+        System.out.println();
+
     }
 }
