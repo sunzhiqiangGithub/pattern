@@ -88,50 +88,45 @@ public class BinarySearchTree<T extends Comparable<T>> {
                 waitingDeleteNode = waitingDeleteNode.left;
             } else {
                 // 执行删除操作
-                if (waitingDeleteNode.left != null && waitingDeleteNode.right != null) {
-                    Node<T> tempNode = waitingDeleteNode.right;
-                    while (tempNode.left != null) {
-                        tempNode = tempNode.left;
-                    }
-                    waitingDeleteNode.data = tempNode.data;
-                    waitingDeleteNode = tempNode;
-                }
-
-                if (waitingDeleteNode.parent != null) {
-                    if (waitingDeleteNode.parent.left != null
-                            && waitingDeleteNode.parent.left.data.compareTo(waitingDeleteNode.data) == 0) {
-                        if (waitingDeleteNode.left != null) {
-                            waitingDeleteNode.parent.left = waitingDeleteNode.left;
-                            waitingDeleteNode.left.parent = waitingDeleteNode.parent;
-                        } else if (waitingDeleteNode.right != null) {
-                            waitingDeleteNode.parent.left = waitingDeleteNode.right;
-                            waitingDeleteNode.right.parent = waitingDeleteNode.parent;
-                        } else {
-                            waitingDeleteNode.parent.left = null;
-                        }
-                    } else {
-                        if (waitingDeleteNode.left != null) {
-                            waitingDeleteNode.parent.right = waitingDeleteNode.left;
-                            waitingDeleteNode.left.parent = waitingDeleteNode.parent;
-                        } else if (waitingDeleteNode.right != null) {
-                            waitingDeleteNode.parent.right = waitingDeleteNode.right;
-                            waitingDeleteNode.right.parent = waitingDeleteNode.parent;
-                        } else {
-                            waitingDeleteNode.parent.right = null;
-                        }
-                    }
-                } else {
-                    if (waitingDeleteNode.left != null) {
-                        this.root = waitingDeleteNode.left;
-                        waitingDeleteNode.left.parent = null;
-                    } else if (waitingDeleteNode.right != null) {
-                        this.root = waitingDeleteNode.right;
-                        waitingDeleteNode.right.parent = null;
-                    } else {
-                        this.root = null;
-                    }
-                }
+                doDelete(waitingDeleteNode);
                 return;
+            }
+        }
+    }
+
+    private void doDelete(Node<T> waitingDeleteNode) {
+        if (waitingDeleteNode.left != null && waitingDeleteNode.right != null) {
+            Node<T> tempNode = waitingDeleteNode.right;
+            while (tempNode.left != null) {
+                tempNode = tempNode.left;
+            }
+            waitingDeleteNode.data = tempNode.data;
+            waitingDeleteNode = tempNode;
+        }
+
+        Node<T> child = null;
+        if (waitingDeleteNode.left != null) {
+            child = waitingDeleteNode.left;
+        } else if (waitingDeleteNode.right != null) {
+            child = waitingDeleteNode.right;
+        } else {
+            child = null;
+        }
+
+        if (waitingDeleteNode.parent == null) {
+            this.root = child;
+            if (child != null) {
+                child.parent = null;
+            }
+        } else if (waitingDeleteNode.parent.left == waitingDeleteNode) {
+            waitingDeleteNode.parent.left = child;
+            if (child != null) {
+                child.parent = waitingDeleteNode.parent;
+            }
+        } else {
+            waitingDeleteNode.parent.right = child;
+            if (child != null) {
+                child.parent = waitingDeleteNode.parent;
             }
         }
     }
@@ -232,7 +227,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
         System.out.print(root.data + " ");
     }
 
-    static class Node<T extends Comparable<T>> {
+    private static class Node<T> {
 
         private T data;
 

@@ -30,6 +30,5 @@ public class Client {
         tree.delete(3);
         tree.preOrderTraversal(tree.getRoot());
         System.out.println();
-
     }
 }
