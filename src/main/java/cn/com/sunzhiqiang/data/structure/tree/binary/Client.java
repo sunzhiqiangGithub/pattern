@@ -10,25 +10,25 @@ public class Client {
 
     public static void main(String[] args) {
 
-        BinaryTree tree = new BinaryTree();
-        BinaryTree.Node root = tree.createTree(new Integer[]{5, 3, 1, 8, 9, 4});
+        BinarySearchTree tree = new BinarySearchTree();
+        tree.create(new Integer[]{5, 3, 1, 8, 9, 4});
 
-        tree.preOrderTraversal(root);
+        tree.preOrderTraversal(tree.getRoot());
         System.out.println();
 
-        tree.inOrderTraversal(root);
+        tree.inOrderTraversal(tree.getRoot());
         System.out.println();
 
-        tree.postOrderTraversal(root);
+        tree.postOrderTraversal(tree.getRoot());
         System.out.println();
 
-        System.out.println(tree.contain(root, 1));
-        System.out.println(tree.contain(root, 89));
+        System.out.println(tree.contain(1));
+        System.out.println(tree.contain(89));
 
-        tree.preOrderTraversal(root);
+        tree.preOrderTraversal(tree.getRoot());
         System.out.println();
-        tree.deleteNodeFromTree(root, 5);
-        tree.preOrderTraversal(root);
+        tree.delete(3);
+        tree.preOrderTraversal(tree.getRoot());
         System.out.println();
 
     }
