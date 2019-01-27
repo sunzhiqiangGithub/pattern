@@ -196,6 +196,14 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     /**
+     * 前序遍历
+     */
+    public void preOrderTraversal() {
+
+        preOrderTraversal(this.root);
+    }
+
+    /**
      * 中序遍历
      *
      * @param root
@@ -212,6 +220,14 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     /**
+     * 中序遍历
+     */
+    public void inOrderTraversal() {
+
+        inOrderTraversal(this.root);
+    }
+
+    /**
      * 后序遍历
      *
      * @param root
@@ -225,6 +241,14 @@ public class BinarySearchTree<T extends Comparable<T>> {
         postOrderTraversal(root.left);
         postOrderTraversal(root.right);
         System.out.print(root.data + " ");
+    }
+
+    /**
+     * 后序遍历
+     */
+    public void postOrderTraversal() {
+
+        postOrderTraversal(this.root);
     }
 
     private static class Node<T> {
