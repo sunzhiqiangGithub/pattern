@@ -17,12 +17,20 @@ public class Client {
         skipList.printAll();
 
         System.out.println("查询");
-        SkipList.Node result = skipList.find(5);
+        SkipList.Node result = skipList.find(6);
         if (result != null) {
             System.out.println("当前结点：" + result.getData());
             if (result.getNext() != null) {
                 System.out.println("下一个结点：" + result.getNext().getData());
             }
         }
+
+        System.out.println("插入结点");
+        skipList.insert(7);
+        skipList.printAll();
+
+        System.out.println("删除结点");
+        skipList.delete(3);
+        skipList.printAll();
     }
 }

@@ -3,6 +3,7 @@ package cn.com.sunzhiqiang.data.structure.skiplist;
 import lombok.Data;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * 功能描述: 跳表
@@ -13,6 +14,9 @@ import java.util.Arrays;
 public class SkipList<T extends Comparable<T>> {
 
     private Node<T> first;
+    private int maxLevel;
+
+    private Random random;
 
     /**
      * 每隔几个结点生成索引
@@ -21,6 +25,7 @@ public class SkipList<T extends Comparable<T>> {
 
     public SkipList(int spacing) {
         this.spacing = spacing;
+        random = new Random();
     }
 
     /**
@@ -49,6 +54,7 @@ public class SkipList<T extends Comparable<T>> {
         // 1.计算需要生成几级索引
         int totalOfNode = data.length;
         int maxLevel = (int) Math.ceil(Math.log(totalOfNode) / Math.log(spacing)) - 1;
+        this.maxLevel = maxLevel;
         for (int i = 1; i <= maxLevel; i++) {
             // 下一层的头结点
             Node<T> downHead = head;
@@ -101,6 +107,7 @@ public class SkipList<T extends Comparable<T>> {
                 }
                 preNode = levelFirst;
                 levelFirst = levelFirst.next;
+                first = preNode;
             }
 
             if (first == null) {
@@ -110,6 +117,90 @@ public class SkipList<T extends Comparable<T>> {
         }
 
         return null;
+    }
+
+    /**
+     * 增加一个结点
+     *
+     * @param t
+     */
+    public void insert(T t) {
+
+        Node<T> first = this.first;
+        int curLevel = this.maxLevel;
+
+        int randomLevel = getRandomLevel();
+
+        while (first != null) {
+            Node<T> levelFirst = first;
+            Node<T> preNode = null;
+            Node<T> upNode = null;
+            while (levelFirst != null) {
+                // 如果插入的元素已经存在，直接返回
+                if (t.compareTo(levelFirst.data) == 0) {
+                    return;
+                }
+                if (t.compareTo(levelFirst.data) < 0) {
+                    if (randomLevel >= curLevel) {
+                        Node<T> waitingInsertNode = new Node<>(t);
+                        waitingInsertNode.next = levelFirst;
+                        preNode.next = waitingInsertNode;
+                        if (upNode != null) {
+                            upNode.down = waitingInsertNode;
+                        }
+                        upNode = waitingInsertNode;
+                    }
+                    first = preNode;
+                    break;
+                }
+                preNode = levelFirst;
+                levelFirst = levelFirst.next;
+                first = preNode;
+            }
+
+            first = first.down;
+            curLevel--;
+        }
+    }
+
+    private int getRandomLevel() {
+
+        int randomLevel = random.nextInt(maxLevel);
+        return randomLevel;
+    }
+
+    /**
+     * 删除一个结点
+     *
+     * @param t
+     */
+    public void delete(T t) {
+
+        Node<T> first = this.first;
+
+        while (first != null) {
+            Node<T> levelFirst = first;
+            Node<T> curNode = null;
+            while (levelFirst != null) {
+                if (t.compareTo(levelFirst.data) == 0) {
+                    first = curNode;
+                    if (curNode != null) {
+                        curNode.next = levelFirst.next;
+                    } else {
+                        // TODO
+                        return;
+                    }
+                    break;
+                } else if (t.compareTo(levelFirst.data) < 0) {
+                    break;
+                }
+                curNode = levelFirst;
+                levelFirst = levelFirst.next;
+                first = curNode;
+            }
+
+            first = first.down;
+        }
     }
 
     /**
