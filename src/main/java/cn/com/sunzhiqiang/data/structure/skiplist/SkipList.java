@@ -183,12 +183,22 @@ public class SkipList<T extends Comparable<T>> {
             Node<T> curNode = null;
             while (levelFirst != null) {
                 if (t.compareTo(levelFirst.data) == 0) {
-                    first = curNode;
                     if (curNode != null) {
+                        first = curNode;
                         curNode.next = levelFirst.next;
                     } else {
-                        // TODO
-                        return;
+                        // 要删除的是头结点
+                        // 把头结点的下一个结点删除
+                        // 头结点的值更新为头结点的下一个结点的值
+                        if (first.down == null) {
+                            T newFirtstData = levelFirst.next == null
+                                    ? null : levelFirst.next.data;
+                            delete(newFirtstData);
+                            updateFirst(newFirtstData);
+                            return;
+                        }
+                        first = levelFirst;
+                        break;
                     }
                     break;
                 } else if (t.compareTo(levelFirst.data) < 0) {
@@ -199,6 +209,14 @@ public class SkipList<T extends Comparable<T>> {
                 first = curNode;
             }
 
+            first = first.down;
+        }
+    }
+
+    private void updateFirst(T newFirtstData) {
+        Node<T> first = this.first;
+        while (first != null) {
+            first.data = newFirtstData;
             first = first.down;
         }
     }
