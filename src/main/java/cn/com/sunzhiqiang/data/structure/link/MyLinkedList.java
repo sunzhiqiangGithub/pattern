@@ -8,94 +8,49 @@ package cn.com.sunzhiqiang.data.structure.link;
  */
 public class MyLinkedList<T> {
 
-    /**
-     * 头结点
-     */
     private Node<T> head;
+    private Node<T> tail;
 
-    /**
-     * 链表中元素个数
-     */
     private int size;
 
     public MyLinkedList() {
         Node<T> node = new Node();
-        head = node;
+        head = tail = node;
 
         size = 0;
     }
 
-    /**
-     * 在链表末尾添加一个结点
-     *
-     * @param t
-     * @return
-     */
     public synchronized MyLinkedList add(T t) {
 
         Node<T> node = new Node<>();
         node.data = t;
 
-        Node<T> temp = head;
-        if (temp.next == null) {
-            temp.next = node;
-            node.prev = temp;
-        } else {
-            node.next = temp.next.next;
-            node.prev = temp;
-            temp.next = node;
-        }
+        node.pre = tail;
+        tail.next = node;
+        tail = tail.next;
 
         size++;
 
         return this;
     }
 
-    /**
-     * 删除链表中值为t的结点
-     *
-     * @param t
-     * @return
-     */
     public synchronized MyLinkedList remove(T t) {
 
         Node temp = head.next;
 
         while (temp != null) {
             if (temp.data.equals(t)) {
-                temp.next.prev = temp.prev;
-                temp.prev.next = temp.next;
-                temp.next = null;
-                temp.prev = null;
+                temp.next.pre = temp.pre;
+                temp.pre.next = temp.next;
 
-                size--;
+                temp.next = null;
+                temp.pre = null;
+
                 break;
             }
 
             temp = temp.next;
         }
-
-        return this;
-    }
-
-    /**
-     * 删除链表的第一个结点
-     *
-     * @return
-     */
-    public synchronized MyLinkedList removeFirst() {
-
-        if (head.next == null) {
-            return this;
-        }
-
-        Node<T> temp = head.next;
-        head.next = head.next.next;
-        if (head.next != null) {
-            head.next.prev = head;
-        }
-        temp.next = null;
-        temp.prev = null;
 
         return this;
     }
@@ -108,9 +63,9 @@ public class MyLinkedList<T> {
             if (temp.data.equals(position)) {
                 Node node = new Node(t);
                 node.next = temp;
-                node.prev = temp.prev;
-                temp.prev.next = node;
-                temp.prev = node;
+                node.pre = temp.pre;
+                temp.pre.next = node;
+                temp.pre = node;
 
                 break;
             }
@@ -128,9 +83,9 @@ public class MyLinkedList<T> {
         while (temp != null) {
             if (temp.data.equals(position)) {
                 Node node = new Node(t);
-                node.prev = temp;
+                node.pre = temp;
                 node.next = temp.next;
-                temp.next.prev = node;
+                temp.next.pre = node;
                 temp.next = node;
 
                 break;
@@ -163,7 +118,7 @@ public class MyLinkedList<T> {
 
     public synchronized T getLast() {
 
-        return null;
+        return tail == null ? null : tail == head ? null : tail.data;
     }
 
     public synchronized int size() {
@@ -188,20 +143,19 @@ public class MyLinkedList<T> {
 
     public String toInvertString() {
 
-//        StringBuilder sb = new StringBuilder("");
-//        Node temp = tail;
-//        while (temp != null && temp != head) {
-//            sb.append(temp.data).append(" ");
-//            temp = temp.prev;
-//        }
-//
-//        return sb.toString();
-        return "";
+        StringBuilder sb = new StringBuilder("");
+        Node temp = tail;
+        while (temp != null && temp != head) {
+            sb.append(temp.data).append(" ");
+            temp = temp.pre;
+        }
+
+        return sb.toString();
     }
 
     static class Node<T> {
 
-        private Node prev;
+        private Node pre;
         private Node next;
 
         private T data;
