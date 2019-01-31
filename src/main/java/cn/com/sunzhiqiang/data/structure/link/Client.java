@@ -11,7 +11,7 @@ public class Client {
 
         MyLinkedList<Integer> linkedList = new MyLinkedList<>();
 
-        linkedList.add(3).add(2).add(6).add(10).add(1);
+        linkedList.addLast(3).addLast(2).addLast(6).addLast(10).addLast(1);
         System.out.println(linkedList.toString());
 
         linkedList.remove(6);

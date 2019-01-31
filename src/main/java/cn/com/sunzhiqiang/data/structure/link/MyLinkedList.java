@@ -8,9 +8,19 @@ package cn.com.sunzhiqiang.data.structure.link;
  */
 public class MyLinkedList<T> {
 
+    /**
+     * 头结点
+     */
     private Node<T> head;
+
+    /**
+     * 尾结点
+     */
     private Node<T> tail;
 
+    /**
+     * 链表的大小
+     */
     private int size;
 
     public MyLinkedList() {
@@ -20,16 +30,93 @@ public class MyLinkedList<T> {
         size = 0;
     }
 
-    public synchronized MyLinkedList add(T t) {
+    /**
+     * 在尾部添加
+     *
+     * @param t
+     * @return
+     */
+    public synchronized MyLinkedList addLast(T t) {
 
-        Node<T> node = new Node<>();
-        node.data = t;
+        Node<T> node = new Node<>(t);
 
-        node.pre = tail;
+        node.prev = tail;
         tail.next = node;
         tail = tail.next;
 
         size++;
+
+        return this;
+    }
+
+    /**
+     * 在头部添加
+     *
+     * @param t
+     * @return
+     */
+    public synchronized MyLinkedList addFirst(T t) {
+
+        Node<T> node = new Node<>(t);
+
+        node.prev = head;
+        node.next = head.next;
+
+        if (head.next == null) {
+            tail = node;
+        } else {
+            head.next.prev = node;
+        }
+        head.next = node;
+
+        return this;
+    }
+
+    /**
+     * 在尾部删除
+     *
+     * @return
+     */
+    public synchronized MyLinkedList removeLast() {
+
+        // 空链表直接返回
+        if (head.next == null) {
+            return this;
+        }
+
+        Node<T> tail = this.tail;
+        tail.prev.next = null;
+        tail.prev = null;
+
+        this.tail = this.tail.prev;
+
+        return this;
+    }
+
+    /**
+     * 在头部删除
+     *
+     * @return
+     */
+    public synchronized MyLinkedList removeFirst() {
+
+        if (head.next == null) {
+            return this;
+        }
+
+        Node<T> first = head.next;
+        // 只有一个结点
+        if (first.next == null) {
+            head.next = null;
+            first.prev = null;
+            tail = head;
+
+        } else {
+            first.next.prev = head;
+            head.next = first.next;
+            first.next = null;
+            first.prev = null;
+        }
 
         return this;
     }
@@ -40,11 +127,11 @@ public class MyLinkedList<T> {
 
         while (temp != null) {
             if (temp.data.equals(t)) {
-                temp.next.pre = temp.pre;
-                temp.pre.next = temp.next;
+                temp.next.prev = temp.prev;
+                temp.prev.next = temp.next;
 
                 temp.next = null;
-                temp.pre = null;
+                temp.prev = null;
 
                 break;
             }
@@ -63,9 +150,9 @@ public class MyLinkedList<T> {
             if (temp.data.equals(position)) {
                 Node node = new Node(t);
                 node.next = temp;
-                node.pre = temp.pre;
-                temp.pre.next = node;
-                temp.pre = node;
+                node.prev = temp.prev;
+                temp.prev.next = node;
+                temp.prev = node;
 
                 break;
             }
@@ -83,9 +170,9 @@ public class MyLinkedList<T> {
         while (temp != null) {
             if (temp.data.equals(position)) {
                 Node node = new Node(t);
-                node.pre = temp;
+                node.prev = temp;
                 node.next = temp.next;
-                temp.next.pre = node;
+                temp.next.prev = node;
                 temp.next = node;
 
                 break;
@@ -147,7 +234,7 @@ public class MyLinkedList<T> {
         Node temp = tail;
         while (temp != null && temp != head) {
             sb.append(temp.data).append(" ");
-            temp = temp.pre;
+            temp = temp.prev;
         }
 
         return sb.toString();
@@ -155,7 +242,7 @@ public class MyLinkedList<T> {
 
     static class Node<T> {
 
-        private Node pre;
+        private Node prev;
         private Node next;
 
         private T data;
@@ -165,6 +252,12 @@ public class MyLinkedList<T> {
 
         public Node(T data) {
             this.data = data;
+        }
+
+        public Node(T data, Node prev, Node next) {
+            this.data = data;
+            this.prev = prev;
+            this.next = next;
         }
     }
 }
