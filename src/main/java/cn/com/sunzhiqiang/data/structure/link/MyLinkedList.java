@@ -84,11 +84,11 @@ public class MyLinkedList<T> {
             return this;
         }
 
-        Node<T> tail = this.tail;
-        tail.prev.next = null;
-        tail.prev = null;
+        Node<T> deletedNode = tail;
+        tail = tail.prev;
 
-        this.tail = this.tail.prev;
+        deletedNode.prev.next = null;
+        deletedNode.prev = null;
 
         return this;
     }
@@ -121,17 +121,28 @@ public class MyLinkedList<T> {
         return this;
     }
 
+    /**
+     * 删除元素t
+     *
+     * @param t
+     * @return
+     */
     public synchronized MyLinkedList remove(T t) {
 
         Node temp = head.next;
 
         while (temp != null) {
             if (temp.data.equals(t)) {
-                temp.next.prev = temp.prev;
-                temp.prev.next = temp.next;
+                if (temp == tail) {
+                    removeLast();
 
-                temp.next = null;
-                temp.prev = null;
+                } else {
+                    temp.next.prev = temp.prev;
+                    temp.prev.next = temp.next;
+
+                    temp.next = null;
+                    temp.prev = null;
+                }
 
                 break;
             }
@@ -142,6 +153,59 @@ public class MyLinkedList<T> {
         return this;
     }
 
+    /**
+     * 删除指定索引的元素
+     *
+     * @param index
+     * @return
+     */
+    public synchronized MyLinkedList remove(int index) {
+
+        // 不存在该元素，直接返回
+        if (index < 0 || index > size - 1) {
+            return this;
+        }
+
+        if (index == 0) {
+            removeFirst();
+            return this;
+        }
+
+        if (index == size - 1) {
+            removeLast();
+            return this;
+        }
+
+        Node temp = null;
+        // 出现在后半部分，从tail开始遍历
+        if (index > (size - 1) / 2) {
+            temp = tail;
+            for (int i = size - 1; i > index; i--) {
+                temp = temp.prev;
+            }
+
+        } else {
+            temp = head.next;
+            for (int i = 0; i < index; i++) {
+                temp = temp.next;
+            }
+        }
+
+        temp.next.prev = temp.prev;
+        temp.prev.next = temp.next;
+        temp.next = null;
+        temp.prev = null;
+
+        return this;
+    }
+
+    /**
+     * 在元素position前插入元素t
+     *
+     * @param position
+     * @param t
+     * @return
+     */
     public synchronized MyLinkedList insertBefore(T position, T t) {
 
         Node temp = head.next;
@@ -163,6 +227,13 @@ public class MyLinkedList<T> {
         return this;
     }
 
+    /**
+     * 在元素position后面插入元素t
+     *
+     * @param position
+     * @param t
+     * @return
+     */
     public synchronized MyLinkedList insertAfter(T position, T t) {
 
         Node temp = head.next;
@@ -172,8 +243,15 @@ public class MyLinkedList<T> {
                 Node node = new Node(t);
                 node.prev = temp;
                 node.next = temp.next;
-                temp.next.prev = node;
-                temp.next = node;
+
+                // temp是尾结点
+                if (temp.next == null) {
+                    temp.next = node;
+                    tail = node;
+                } else {
+                    temp.next.prev = node;
+                    temp.next = node;
+                }
 
                 break;
             }
@@ -184,6 +262,12 @@ public class MyLinkedList<T> {
         return this;
     }
 
+    /**
+     * 查询链表是否包含元素t
+     *
+     * @param t
+     * @return
+     */
     public synchronized boolean contain(T t) {
 
         Node temp = head.next;
@@ -198,21 +282,41 @@ public class MyLinkedList<T> {
         return false;
     }
 
+    /**
+     * 获取第一个元素
+     *
+     * @return
+     */
     public synchronized T getFirst() {
 
         return head.next == null ? null : (T) head.next.data;
     }
 
+    /**
+     * 获取最后一个元素
+     *
+     * @return
+     */
     public synchronized T getLast() {
 
         return tail == null ? null : tail == head ? null : tail.data;
     }
 
+    /**
+     * 链表的大小
+     *
+     * @return
+     */
     public synchronized int size() {
 
         return size;
     }
 
+    /**
+     * 链表字符串
+     *
+     * @return
+     */
     public String toString() {
 
         Node temp = head.next;
@@ -228,6 +332,11 @@ public class MyLinkedList<T> {
         return sb.toString();
     }
 
+    /**
+     * 链表反向字符串
+     *
+     * @return
+     */
     public String toInvertString() {
 
         StringBuilder sb = new StringBuilder("");
@@ -240,6 +349,11 @@ public class MyLinkedList<T> {
         return sb.toString();
     }
 
+    /**
+     * 链表结点
+     *
+     * @param <T>
+     */
     static class Node<T> {
 
         private Node prev;
