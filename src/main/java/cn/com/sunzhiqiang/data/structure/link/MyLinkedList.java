@@ -1,5 +1,7 @@
 package cn.com.sunzhiqiang.data.structure.link;
 
+import lombok.Data;
+
 /**
  * 功能描述: 双向链表
  *
@@ -59,15 +61,20 @@ public class MyLinkedList<T> {
 
         Node<T> node = new Node<>(t);
 
-        node.prev = head;
-        node.next = head.next;
+        return addFirstNode(node);
+    }
+
+    public synchronized MyLinkedList addFirstNode(Node first) {
+
+        first.prev = head;
+        first.next = head.next;
 
         if (head.next == null) {
-            tail = node;
+            tail = first;
         } else {
-            head.next.prev = node;
+            head.next.prev = first;
         }
-        head.next = node;
+        head.next = first;
 
         return this;
     }
@@ -293,6 +300,16 @@ public class MyLinkedList<T> {
     }
 
     /**
+     * 获取第一个结点
+     *
+     * @return
+     */
+    public synchronized Node<T> getFirstNode() {
+
+        return head.next;
+    }
+
+    /**
      * 获取最后一个元素
      *
      * @return
@@ -300,6 +317,16 @@ public class MyLinkedList<T> {
     public synchronized T getLast() {
 
         return tail == null ? null : tail == head ? null : tail.data;
+    }
+
+    /**
+     * 获取最后一个结点
+     *
+     * @return
+     */
+    public synchronized Node<T> getLastNode() {
+
+        return tail;
     }
 
     /**
@@ -354,7 +381,8 @@ public class MyLinkedList<T> {
      *
      * @param <T>
      */
-    static class Node<T> {
+    @Data
+    public static class Node<T> {
 
         private Node prev;
         private Node next;
