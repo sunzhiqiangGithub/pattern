@@ -6,7 +6,7 @@ package cn.com.sunzhiqiang.algorithm.link;
  * @author sunzhiqiang
  * @create 2019-03-02
  */
-public class SingleList<T> {
+public class SingleList<T extends Comparable<T>> {
 
     public Node<T> head;
 
@@ -36,7 +36,7 @@ public class SingleList<T> {
         System.out.println();
     }
 
-    public static class Node<T> {
+    public static class Node<T extends Comparable<T>> {
 
         public Node next;
         public T data;
