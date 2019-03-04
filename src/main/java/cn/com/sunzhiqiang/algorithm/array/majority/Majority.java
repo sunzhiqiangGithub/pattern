@@ -39,6 +39,10 @@ public class Majority {
                 maxCount = count;
                 mode = tempArray[i];
             }
+
+            if (maxCount > length / 2) {
+                break;
+            }
         }
 
         return mode;
