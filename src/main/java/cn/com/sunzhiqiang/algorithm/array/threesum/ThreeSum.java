@@ -14,7 +14,7 @@ public class ThreeSum {
 
     public static void main(String[] args) {
 
-        int[] nums = new int[]{0, -4, -1, -4, -2, -3, 2}; // -4,-4,-3,-2,-1,0,2
+        int[] nums = new int[]{0, 0, 0, 0}; // -4,-4,-3,-2,-1,0,2
 
         List<List<Integer>> result = threeSum(nums);
         for (List<Integer> integers : result) {
@@ -35,33 +35,55 @@ public class ThreeSum {
         int[] tempArray = Arrays.copyOf(nums, nums.length);
         Arrays.sort(tempArray);
 
-        for (int i = 0; i < tempArray.length - 2; i++) {
+        int i = 0;
+        int j = 0;
+        int k = 0;
+        int first = 0;
+        int second = 0;
+        int third = 0;
+        int sum = 0;
+
+        int length = tempArray.length;
+
+        for (i = 0; i < length - 2; i++) {
             if (i > 0 && tempArray[i] == tempArray[i - 1]) {
                 continue;
             }
-            for (int j = i + 1; j < tempArray.length - 1; j++) {
-                if (j > 1 && j != i + 1 && tempArray[j] == tempArray[j - 1]) {
+            first = tempArray[i];
+            j = i + 1;
+            k = length - 1;
+            while (j < k) {
+                second = tempArray[j];
+                third = tempArray[k];
+                sum = first + second + third;
+                if (sum < 0) {
+                    j++;
+                    while (j < k && second == tempArray[j]) {
+                        j++;
+                    }
                     continue;
                 }
-                for (int k = tempArray.length - 1; k > j; k--) {
-                    if (k < tempArray.length - 1 && tempArray[k] == tempArray[k + 1]) {
-                        continue;
+                if (sum > 0) {
+                    k--;
+                    while (j < k && third == tempArray[k]) {
+                        k--;
                     }
-                    int first = tempArray[i];
-                    int second = tempArray[j];
-                    int third = tempArray[k];
-                    int sum = first + second + third;
-                    if (sum < 0) {
-                        break;
-                    }
-                    if (sum > 0) {
-                        continue;
-                    }
+                    continue;
+                }
+                if (sum == 0) {
                     List<Integer> list = new ArrayList<>(3);
                     list.add(first);
                     list.add(second);
                     list.add(third);
                     result.add(list);
+                    k--;
+                    while (j < k && third == tempArray[k]) {
+                        k--;
+                    }
+                    j++;
+                    while (j < k && second == tempArray[j]) {
+                        j++;
+                    }
                 }
             }
         }
