@@ -45,7 +45,7 @@ public class ThreeSum {
 
         int length = tempArray.length;
 
-        for (i = 0; i < length - 2; i++) {
+        for (i = 0; i < length - 2 && tempArray[i] <= 0; i++) {
             if (i > 0 && tempArray[i] == tempArray[i - 1]) {
                 continue;
             }
