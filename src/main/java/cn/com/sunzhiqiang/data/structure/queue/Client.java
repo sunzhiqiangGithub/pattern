@@ -12,7 +12,6 @@ public class Client {
     public static void main(String[] args) {
 
         MyQueue<Integer> myQueue = new MyQueue<>(10);
-
         Random random = new Random();
         for (int i = 0; i < 100; i++) {
             if (i % 3 == 0) {
@@ -22,6 +21,20 @@ public class Client {
             }
 
             System.out.println(myQueue.toString());
+        }
+
+        System.out.println("=============================");
+
+        MyLinkQueue<Integer> myLinkQueue = new MyLinkQueue<>(10);
+        random = new Random();
+        for (int i = 0; i < 100; i++) {
+            if (i % 3 == 0) {
+                myLinkQueue.pop();
+            } else {
+                boolean success = myLinkQueue.offer(random.nextInt(30));
+            }
+
+            System.out.println(myLinkQueue);
         }
     }
 }
