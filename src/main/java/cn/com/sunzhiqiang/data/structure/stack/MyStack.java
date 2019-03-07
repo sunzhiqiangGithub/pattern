@@ -69,6 +69,17 @@ public class MyStack<E> {
         return false;
     }
 
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = top - 1; i >= 0; i--) {
+            sb.append(elements[i]).append("\t");
+        }
+
+        return sb.toString();
+    }
+
     private void expandArray() {
 
         elements = Arrays.copyOf(elements, elements.length * 2);
