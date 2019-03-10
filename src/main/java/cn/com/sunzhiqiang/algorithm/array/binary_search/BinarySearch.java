@@ -11,7 +11,7 @@ public class BinarySearch {
     public static void main(String[] args) {
 
         int[] sortedArray = new int[]{1, 3, 5, 6, 6, 6, 10, 15, 30};
-        int value = 6;
+        int value = 11;
 
         BinarySearch binarySearch = new BinarySearch();
         int result = binarySearch.binarySearch(sortedArray, value);
@@ -85,7 +85,7 @@ public class BinarySearch {
             } else if (value < sortedArray[middle]) {
                 end = middle - 1;
             } else {
-                if (value == sortedArray[middle - 1]) {
+                if (middle > 0 && value == sortedArray[middle - 1]) {
                     end = middle - 1;
                 } else {
                     return middle;
@@ -116,7 +116,7 @@ public class BinarySearch {
             } else if (value < sortedArray[middle]) {
                 end = middle - 1;
             } else {
-                if (value == sortedArray[middle + 1]) {
+                if (middle < sortedArray.length - 1 && value == sortedArray[middle + 1]) {
                     start = middle + 1;
                 } else {
                     return middle;
@@ -147,15 +147,9 @@ public class BinarySearch {
                 if (value < sortedArray[middle + 1]) {
                     return middle + 1;
                 }
-            } else if (value < sortedArray[middle]) {
+            } else if (value <= sortedArray[middle]) {
                 end = middle - 1;
-                if (value > sortedArray[middle - 1]) {
-                    return middle;
-                }
-            } else {
-                if (value == sortedArray[middle - 1]) {
-                    end = middle - 1;
-                } else {
+                if (middle == 0 || value > sortedArray[middle - 1]) {
                     return middle;
                 }
             }
@@ -179,21 +173,15 @@ public class BinarySearch {
         int middle;
         while (start <= end) {
             middle = (start + end) / 2;
-            if (value > sortedArray[middle]) {
+            if (value >= sortedArray[middle]) {
                 start = middle + 1;
-                if (value < sortedArray[middle + 1]) {
+                if (middle == sortedArray.length - 1 || value < sortedArray[middle + 1]) {
                     return middle;
                 }
             } else if (value < sortedArray[middle]) {
                 end = middle - 1;
                 if (value > sortedArray[middle - 1]) {
                     return middle - 1;
-                }
-            } else {
-                if (value == sortedArray[middle + 1]) {
-                    start = middle + 1;
-                } else {
-                    return middle;
                 }
             }
         }
