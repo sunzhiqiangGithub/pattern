@@ -11,7 +11,7 @@ public class BinarySearch {
     public static void main(String[] args) {
 
         int[] sortedArray = new int[]{1, 3, 5, 6, 6, 6, 10, 15, 30};
-        int value = 11;
+        int value = 6;
 
         BinarySearch binarySearch = new BinarySearch();
         int result = binarySearch.binarySearch(sortedArray, value);
@@ -85,10 +85,11 @@ public class BinarySearch {
             } else if (value < sortedArray[middle]) {
                 end = middle - 1;
             } else {
-                while (sortedArray[middle] == value) {
-                    middle--;
+                if (value == sortedArray[middle - 1]) {
+                    end = middle - 1;
+                } else {
+                    return middle;
                 }
-                return middle + 1;
             }
         }
 
@@ -115,10 +116,11 @@ public class BinarySearch {
             } else if (value < sortedArray[middle]) {
                 end = middle - 1;
             } else {
-                while (sortedArray[middle] == value) {
-                    middle++;
+                if (value == sortedArray[middle + 1]) {
+                    start = middle + 1;
+                } else {
+                    return middle;
                 }
-                return middle - 1;
             }
         }
 
@@ -151,10 +153,11 @@ public class BinarySearch {
                     return middle;
                 }
             } else {
-                while (sortedArray[middle] == value) {
-                    middle--;
+                if (value == sortedArray[middle - 1]) {
+                    end = middle - 1;
+                } else {
+                    return middle;
                 }
-                return middle + 1;
             }
         }
 
@@ -187,10 +190,11 @@ public class BinarySearch {
                     return middle - 1;
                 }
             } else {
-                while (sortedArray[middle] == value) {
-                    middle++;
+                if (value == sortedArray[middle + 1]) {
+                    start = middle + 1;
+                } else {
+                    return middle;
                 }
-                return middle - 1;
             }
         }
 
