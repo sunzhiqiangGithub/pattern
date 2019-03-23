@@ -12,7 +12,9 @@ public class Factorial {
 
     public static void main(String[] args) {
 
-        System.out.println(getItemByParam(5));
+        System.out.println(getItemByParam(10));
+
+        System.out.println(getItemByParam(10, 1));
     }
 
     private static int getItemByParam(int n) {
@@ -26,5 +28,18 @@ public class Factorial {
         }
 
         return n * getItemByParam(n - 1);
+    }
+
+    private static int getItemByParam(int n, int res) {
+
+        if (n <= 0) {
+            throw new InvalidParameterException("参数必须大于0");
+        }
+
+        if (n == 1) {
+            return res;
+        }
+
+        return getItemByParam(n - 1, n * res);
     }
 }
