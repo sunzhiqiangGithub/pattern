@@ -44,6 +44,7 @@
 + ReentrantReadWriteLock
 + Exchanger
 + Fork/Join框架
++ CompletableFuture
 
 ## <font color="#000066">网络</font>
 + oio
