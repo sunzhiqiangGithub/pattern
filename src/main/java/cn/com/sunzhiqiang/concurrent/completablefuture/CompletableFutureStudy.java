@@ -18,12 +18,14 @@ public class CompletableFutureStudy {
         CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> invokeRomoteService())
                 .thenCombine(CompletableFuture.supplyAsync(CompletableFutureStudy::invokeRomoteService2),
                              (result1, result2) -> result1 * result2)
-                .thenAcceptAsync(CompletableFutureStudy::onCompletion);
+                .thenRunAsync(CompletableFutureStudy::onCompletionRun);
 
         future.get();
     }
 
     private static int invokeRomoteService() {
+
+        System.out.println("远程调用1");
 
         try {
             TimeUnit.SECONDS.sleep(1);
@@ -35,6 +37,8 @@ public class CompletableFutureStudy {
     }
 
     private static int invokeRomoteService2() {
+
+        System.out.println("远程调用2");
 
         try {
             TimeUnit.SECONDS.sleep(1);
@@ -48,10 +52,16 @@ public class CompletableFutureStudy {
     private static void onCompletion(int a) {
 
         System.out.println("回调方法");
+
         try {
             System.out.println(a);
         } catch (Exception e) {
 
         }
+    }
+
+    private static void onCompletionRun() {
+
+        System.out.println("回调run");
     }
 }
