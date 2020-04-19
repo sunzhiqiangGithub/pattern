@@ -19,27 +19,29 @@ public class ValidBrackets {
     public static boolean isValid(String s) {
 
         char[] charArray = s.toCharArray();
-
         Stack<Character> stack = new Stack();
 
-        for (int i = 0; i < charArray.length; i++) {
-            if (!stack.empty()) {
-                Character temp = stack.peek();
-                if ((charArray[i] == ')' && temp == '(')
-                        || (charArray[i] == ']' && temp == '[')
-                        || (charArray[i] == '}' && temp == '{')) {
-                    stack.pop();
-                    continue;
+        for (int i = 0, length = charArray.length; i < length; i++) {
+            if (charArray[i] == ')') {
+                if (stack.empty() || stack.peek() != '(') {
+                    return false;
                 }
+                stack.pop();
+            } else if (charArray[i] == ']') {
+                if (stack.empty() || stack.peek() != '[') {
+                    return false;
+                }
+                stack.pop();
+            } else if (charArray[i] == '}') {
+                if (stack.empty() || stack.peek() != '{') {
+                    return false;
+                }
+                stack.pop();
+            } else {
+                stack.push(charArray[i]);
             }
-
-            stack.push(charArray[i]);
         }
 
-        if (stack.empty()) {
-            return true;
-        } else {
-            return false;
-        }
+        return stack.empty();
     }
 }
